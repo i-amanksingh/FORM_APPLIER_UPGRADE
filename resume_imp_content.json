@@ -1,0 +1,298 @@
+{
+  "ats_score": 85,
+  "preffered_job": [
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "Backend Developer",
+    "AI/ML Developer"
+  ],
+  "year_of_exp": 1,
+  "prompt": {
+    "is_resume": true,
+    "personal_info": {
+      "full_name": "Aman Kumar Singh",
+      "phone": "+91 9810307102",
+      "email": "amankumar.singh8501@gmail.com",
+      "linkedin": "www.linkedin.com/in/i-amanksingh",
+      "github": "github.com/i-amanksingh",
+      "gender": "Male",
+      "ethnicity": "Asian",
+      "available_to_join_days": "answer yourself based on my resume"
+    },
+    "professional_summary": "Results-driven Computer Science Engineering student specializing in Data Science, AI/ML, and backend development. Skilled in Python, FastAPI, Flask, and data analytics with experience in building scalable applications, REST APIs, and real-time data-driven solutions.",
+    "total_experience_years": 1,
+    "DOB": "28/10/2005",
+    "Current Salary": "5LPA",
+    "Expected Salary": "7LPA",
+    "work_experience": [
+      {
+        "job_title": "AI/ML Developer Intern",
+        "company": "Allsoft Solutions Pvt Ltd",
+        "location": "Gurugram",
+        "start_date": "2025-06",
+        "end_date": "2025-07",
+        "currently_working": false,
+        "achievements": [
+          "Developed and tested AI/ML models using Python and machine learning libraries to improve prediction accuracy and automate business processes.",
+          "Analyzed large datasets, performed data cleaning and feature engineering, and generated actionable insights that supported data-driven decision-making.",
+          "Collaborated with cross-functional teams to build dashboards, optimize model performance, and enhance operational efficiency through AI-based solutions."
+        ]
+      },
+      {
+        "job_title": "Backend Developer Intern",
+        "company": "HypeTeck Lifestyle",
+        "location": "Gurugram",
+        "start_date": "2024-06",
+        "end_date": "2024-08",
+        "currently_working": false,
+        "achievements": [
+          "Developed, tested, and maintained high-throughput REST API endpoints using FastAPI for production backend services, ensuring seamless cross-team frontend integration.",
+          "Implemented robust data validation and error-handling strategies that reduced API failure rates by 25%.",
+          "Optimized backend performance and query latency, improving data flow efficiency between client and server architectures."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "B.Tech in Computer Science Engineering",
+        "field_of_study": "Data Science",
+        "institution": "K.R. Mangalam University",
+        "location": "Gurugram",
+        "start_date": "2023",
+        "end_date": "Present",
+        "currently_enrolled": true,
+        "gpa": "8.02",
+        "score_percentage": null,
+        "honors": null
+      },
+      {
+        "degree": "Senior Secondary (12th)",
+        "field_of_study": null,
+        "institution": "S.D Memorial Sr. Sec. School",
+        "location": "Gurugram",
+        "start_date": "2021",
+        "end_date": "2023",
+        "currently_enrolled": false,
+        "gpa": null,
+        "score_percentage": 83,
+        "honors": null
+      },
+      {
+        "degree": "Secondary (10th)",
+        "field_of_study": null,
+        "institution": "Our Lady of Fatima Sr. Sec. School",
+        "location": "Gurugram",
+        "start_date": "2021",
+        "end_date": null,
+        "currently_enrolled": false,
+        "gpa": null,
+        "score_percentage": 92,
+        "honors": null
+      }
+    ],
+    "skills": {
+      "programming_languages": [
+        "Python",
+        "JavaScript",
+        "Java",
+        "SQL (MySQL, PostgreSQL, MongoDB)",
+        "HTML5",
+        "CSS3"
+      ],
+      "frameworks_libraries": [
+        "FastAPI",
+        "Flask",
+        "REST APIs",
+        "WebSockets",
+        "SQLite",
+        "Pandas",
+        "NumPy",
+        "Time-Series Analysis",
+        "Backtesting",
+        "Upstox API",
+        "React",
+        "Next.js",
+        "Tailwind CSS"
+      ],
+      "databases": [],
+      "cloud_devops": [
+        "Docker",
+        "AWS Basics",
+        "Microsoft Azure"
+      ],
+      "data_analytics": [
+        "Pandas",
+        "NumPy",
+        "Time-Series Analysis",
+        "Backtesting",
+        "Upstox API"
+      ],
+      "design_tools": [],
+      "soft_skills": [],
+      "languages": [],
+      "other_skills": [
+        "Git",
+        "GitHub"
+      ]
+    },
+    "projects": [
+      {
+        "name": "Algorithmic Trading System",
+        "technologies_used": [
+          "Python",
+          "Pandas",
+          "FastAPI",
+          "Upstox API"
+        ],
+        "description_bullets": [
+          "Built multi-asset algorithmic trading bots using Python, integrating the Upstox API to process real-time market feeds.",
+          "Implemented automated trade signal generation and order execution logic based on price action, volume, and Open Interest analysis.",
+          "Developed a custom backtesting engine to evaluate historical strategy performance, optimizing risk parameters to achieve a target Sharpe Ratio of 1.02."
+        ],
+        "url": null,
+        "start_date": null,
+        "end_date": null
+      },
+      {
+        "name": "Startup Helping Project – DS Analytics Dashboard",
+        "technologies_used": [
+          "Python",
+          "Flask",
+          "React",
+          "JavaScript"
+        ],
+        "description_bullets": [
+          "Developed an intelligent, full-stack stock screening tool aggregating real-time and historical market data for early-stage evaluation.",
+          "Designed and deployed an interactive dashboard surfacing critical risk/reward metrics, including asset volatility and historical drawdown.",
+          "Integrated Flask backend with a React frontend to deliver fluid, real-time data visualization of technical indicators."
+        ],
+        "url": null,
+        "start_date": null,
+        "end_date": null
+      },
+      {
+        "name": "Breakout Detection Bot",
+        "technologies_used": [
+          "Python",
+          "Pandas",
+          "API Integration"
+        ],
+        "description_bullets": [
+          "Designed a standalone breakout detection system leveraging automated mathematical filters (EMA, RSI, ATR) and technical price patterns.",
+          "Built a real-time signal alerting system that successfully flags high-probability trade opportunities with 73% accuracy."
+        ],
+        "url": null,
+        "start_date": null,
+        "end_date": null
+      }
+    ],
+    "certifications": [
+      {
+        "name": "Machine Learning with R",
+        "issuing_organization": "IBM",
+        "issue_date": null,
+        "expiry_date": null,
+        "credential_id": null,
+        "credential_url": null
+      },
+      {
+        "name": "Data Analysis with Python",
+        "issuing_organization": "IBM",
+        "issue_date": null,
+        "expiry_date": null,
+        "credential_id": null,
+        "credential_url": null
+      },
+      {
+        "name": "Data Science Professional Certification",
+        "issuing_organization": "Oracle",
+        "issue_date": null,
+        "expiry_date": null,
+        "credential_id": null,
+        "credential_url": null
+      },
+      {
+        "name": "Google Data Analytics Professional Certificate",
+        "issuing_organization": "Coursera",
+        "issue_date": null,
+        "expiry_date": null,
+        "credential_id": null,
+        "credential_url": null
+      }
+    ],
+    "awards_honors": [],
+    "publications": [],
+    "volunteer_experience": [],
+    "ats_analysis": {
+      "ats_score": 85,
+      "suggested_job_titles": [
+        "Data Scientist",
+        "Machine Learning Engineer",
+        "Backend Developer",
+        "AI/ML Developer"
+      ],
+      "primary_industries": [
+        "Technology",
+        "Finance",
+        "Data Analytics"
+      ],
+      "key_strengths": [
+        "Developed and tested AI/ML models",
+        "Analyzed large datasets and performed data cleaning",
+        "Collaborated with cross-functional teams",
+        "Developed high-throughput REST API endpoints",
+        "Implemented robust data validation and error-handling strategies"
+      ],
+      "seniority_level": "Junior",
+      "years_of_experience": 1,
+      "top_skills": [
+        "Python",
+        "FastAPI",
+        "Flask",
+        "REST APIs",
+        "Data Analytics",
+        "Machine Learning",
+        "Backend Development",
+        "Docker",
+        "AWS Basics",
+        "Microsoft Azure"
+      ],
+      "job_fit_areas": [
+        "Data Science",
+        "Machine Learning",
+        "Backend Development",
+        "AI/ML Development"
+      ]
+    },
+    "user_supplied": {
+      "how_did_you_hear": "likedin",
+      "saarthee_employee_reference": "no",
+      "employee_reference": "no",
+      "jee_mains_year": "2023",
+      "resume": "fill self everything",
+      "prior_worker": "Yes",
+      "notice_period": "30",
+      "available_to_join_days": "answer yourself based on my resume",
+      "gender_female_male_other_do_not_want_to_": "Male",
+      "reason_for_change": "Boring",
+      "frontend_backend_split": "90",
+      "working_since": "22/3/2026",
+      "custom_question": "answer yourself",
+      "variable_pay": "10000",
+      "last_working_day": "immediate",
+      "role_applying_for_other": "Backend Developer",
+      "verification_code": "SDE1",
+      "first_name": "Aman",
+      "referred_by": "No",
+      "address": "153 Vishun Garden Rajendra Park6",
+      "why_join_weboraz": "answer yourself based on my resume",
+      "day_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_": "28/10/2005",
+      "if_yes_share_the_employee_id": "no",
+      "no": "Yes",
+      "are_you_comfortable_wfo_gurgaon_no": "yes",
+      "have_you_completed_your_graduation_post_": "yes",
+      "pincode": "122001"
+    }
+  },
+  "resume_path": "E:\\Complete_job_applier\\Aman_Kumar_Singh.pdf"
+}
