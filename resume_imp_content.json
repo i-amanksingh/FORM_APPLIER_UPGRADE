@@ -15,9 +15,12 @@
       "email": "amankumar.singh8501@gmail.com",
       "linkedin": "www.linkedin.com/in/i-amanksingh",
       "github": "github.com/i-amanksingh",
+      "website": "https://amankumarsingh.vercel.app",
+      "portfolio": "https://amankumarsingh.vercel.app",
       "gender": "Male",
       "ethnicity": "Asian",
-      "available_to_join_days": "answer yourself based on my resume"
+      "available_to_join_days": "answer yourself based on my resume",
+      "how_did_you_hear": "LinkedIn"
     },
     "professional_summary": "Results-driven Computer Science Engineering student specializing in Data Science, AI/ML, and backend development. Skilled in Python, FastAPI, Flask, and data analytics with experience in building scalable applications, REST APIs, and real-time data-driven solutions.",
     "total_experience_years": 1,

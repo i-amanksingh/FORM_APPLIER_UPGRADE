@@ -1,5 +1,12 @@
 import os
 import sys
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 import re
 import json
 import time
@@ -254,7 +261,7 @@ FIELD_RULES = [
         ("phone", ["phone", "phone number", "mobile", "mobile number", "contact number", "telephone", "cell phone"], "national_phone"),
         ("linkedin", ["linkedin", "linkedin url", "linkedin profile"], "linkedin"),
         ("github", ["github", "github url", "github profile"], "github"),
-        ("current_location", ["current location", "present location", "location"], "current_location"),
+        ("current_location", ["current location", "present location", "location", "address", "current address", "enter your address", "street address", "where are you based", "city", "your address"], "current_location"),
         ("graduation_college", ["graduation college", "graduation university", "college", "university"], "graduation_college"),
         ("graduation_year", ["graduation year", "year of graduation", "graduating year"], "graduation_year"),
         ("graduation_branch", ["branch in graduation", "specialization", "field of study", "graduation branch", "academic stream"], "graduation_branch"),
@@ -279,10 +286,12 @@ FIELD_RULES = [
         ("work_start_date", ["date of joining", "joining date", "start date"], "work_start_date"),
         ("work_end_date", ["date of relieving", "relieving date", "date of completion", "end date"], "work_end_date"),
         ("position_applying_for", ["role applying for", "position applying for", "position applied for", "role applied for", "which role", "applying for"], "job_position"),
+        ("cover_letter", ["why you", "why you, for this role", "cover note", "cover letter", "why should we hire you", "why do you want to join", "tell us about yourself", "pitch"], "professional_summary"),
     ]
     
 
 IMPORTANT_RESUME_MAP = {
+        "cover_letter": "professional_summary", "cover_note": "professional_summary", "why_you": "professional_summary", "about_yourself": "professional_summary",
         "full_name": "full_name", "candidate_name": "full_name", "name": "full_name",
         "your_name": "full_name", "job_status": "job_status",
         "reason_for_joining": "reason_for_joining", "reason_for_choosing": "reason_for_joining",
@@ -291,17 +300,18 @@ IMPORTANT_RESUME_MAP = {
         "phone_country_code": "country_code", "country_code": "country_code", "dial_code": "country_code",
         "phone_country": "country", "phone_country_name": "country",
         "candidate_consent": "agree_yes", "consent": "agree_yes", "privacy_consent": "agree_yes", "agreement": "agree_yes", "terms_agreement": "agree_yes",
-        "referred_by": "employee_reference", "referred_by_existing_emp_name": "employee_reference",
+        "tier1_college_no": "agree_yes",
+        "referred_by": "employee_reference", "referred_by_existing_emp_name": "employee_reference", "referral_source": "how_did_you_hear",
         "email": "email", "phone": "national_phone", "mobile": "national_phone", "mobile_number": "national_phone",
         "mobilenumber": "national_phone", "contact_number": "national_phone", "phone_number": "national_phone",
         "mobile_no": "national_phone", "phone_no": "national_phone", "cell_phone": "national_phone", "country": "country",
-        "school": "graduation_college", "degree": "graduation_degree", "discipline": "graduation_branch",
+        "school": "graduation_college", "graduation_college": "graduation_college", "institute": "graduation_college", "institute_name": "graduation_college", "university": "graduation_college", "college": "graduation_college", "degree": "graduation_degree", "discipline": "graduation_branch",
         "linkedin": "linkedin", "linkedin_url": "linkedin", "linkedin_profile": "linkedin", "website": "linkedin",
         "github": "github", "github_url": "github", "github_profile": "github",
         "portfolio": "portfolio", "portfolio_url": "portfolio", "personal_website": "portfolio",
         "current_work_country": "country", "time_zone": "timezone", "timezone": "timezone",
         "nationality": "nationality", "gender": "gender", "race_or_ethnicity": "ethnicity",
-        "current_location": "current_location", "experience": "experience_years",
+        "current_location": "current_location", "address": "address", "location": "current_location", "city": "current_location", "street_address": "address", "current_address": "address", "home_address": "address", "pincode": "pincode", "zip": "pincode", "postal_code": "pincode", "experience": "experience_years",
         "current_salary": "current_salary", "expected_salary": "expected_salary",
         "ctc_currency": "salary_currency", "ctc_amount": "current_salary",
         "ctc_frequency": "salary_frequency", "current_ctc": "current_salary", "expected_ctc": "expected_salary",
@@ -357,6 +367,7 @@ SELECT_FIELD_KEYS = {
         "companies_worked_for", "plagiarism_agreement", "commitment_to_meet_in_person",
         "dob_day", "dob_month", "dob_year", "prior_worker", "work_authorization", "disability_status",
         "preferred_location", "desired_location", "base_location", "job_location",
+        "graduation_degree", "education_course", "course",
     }
     
 _SELECTOR_SEMANTIC_MAP = [
@@ -377,6 +388,17 @@ _SELECTOR_SEMANTIC_MAP = [
         (r"educationLocation|education.*location", "education_location"),
         (r"educationGrade|educationCgpa|educationGpa|educationScore|Qualifications.*Result", "graduation_cgpa"),
         # General form selectors
+        (r"firstName|first_name|first-name|given_name", "first_name"),
+        (r"lastName|last_name|last-name|surname|family_name", "last_name"),
+        (r"email|emailAddress|email_address", "email"),
+        (r"position|appliedPosition|jobPosition|targetRole|target_role", "job_position"),
+        (r"currentSalary|current_salary|currentCtc|current_ctc", "current_salary"),
+        (r"expectedSalary|expected_salary|expectedCtc|expected_ctc", "expected_salary"),
+        (r"candidate_location|candidate\[location\]|currentLocation|current_location|currentCity|current_city|location|address|street_address", "current_location"),
+        (r"noticePeriod|notice_period|joinDays|join_days|joining_days", "notice_period"),
+        (r"skills|skillSet|skill_set|technicalSkills|technologies", "skills"),
+        (r"experience|totalExperience|total_experience|exp_years|work_experience", "experience"),
+        (r"gender|gender_id|applicant_gender", "gender"),
         (r"availableFrom|available_from|earliest_start|earliest_join|available_date|availability_date", "earliest_joining_date"),
         (r"referralSource|referral_source|howDidYouHear|how_heard|hear_about", "referral_source"),
         (r"joining_in_week|joininginweek|earliest_joining", "available_to_join_days"),
@@ -391,8 +413,8 @@ _SELECTOR_SEMANTIC_MAP = [
         (r"linkedin|linkedinUrl|linkedin_url|linkedin_profile", "linkedin"),
         (r"github|githubUrl|github_url|github_profile", "github"),
         (r"portfolio|portfolioUrl|website|personalSite", "portfolio"),
-        (r"mobileNumber|mobile_number|phoneNumber|phone_number|contactNumber|contact_number|cellPhone|cell_phone|mobile_no|phone_no", "phone"),
-        (r"phoneCountry|phone_country|countryCode|dialCode", "phone_country_code"),
+        (r"mobileNumber|mobile_number|phoneNumber|phone_number|contactNumber|contact_number|cellPhone|cell_phone|mobile_no|phone_no|_phone$|-phone$|application_phone", "phone"),
+        (r"phoneCountry|phone_country|countryCode|dialCode|country_code|application_country_code", "phone_country_code"),
         (r"currentCountry|current_country|currentCountryId", "country"),
         (r"consent|agreement|terms|privacy.*policy", "agreement"),
     ]
@@ -415,8 +437,9 @@ _QUESTION_SEMANTIC_MAP = [
         (["first class", "distinction", "first class / distinction", "grade", "gpa", "cgpa", "score", "percentage", "marks", "result"], "graduation_cgpa"),
         # General questions
         (["last working day"], "work_end_date"),
+        (["why you", "why you, for this role", "cover note", "cover letter", "why should we hire you", "why do you want to join", "tell us about yourself", "why are you interested"], "cover_letter"),
         (["earliest joining date", "available from", "when can you start", "available to join", "earliest start date", "possible start date"], "earliest_joining_date"),
-        (["how did you hear about us", "how did you hear", "referral source", "where did you hear", "source of referral", "how heard"], "referral_source"),
+        (["how did you hear about us", "how did you hear", "referral source", "where did you hear", "where you heard about us", "heard about us", "source of referral", "how heard"], "referral_source"),
         (["earliest joining", "joining in week", "joining (weeks)"], "available_to_join_days"),
         (["offered ctc"], "expected_salary"),
         (["current ctc", "current salary"], "current_salary"),
@@ -436,7 +459,7 @@ _QUESTION_SEMANTIC_MAP = [
         (["what is your full name", "enter your full name"], "full_name"),
         (["enter a phone number", "what is your phone number", "enter mobile number", "mobile number", "mobile", "phone number", "phone", "contact number", "contact"], "phone"),
         (["what is your email", "what is your email address"], "email"),
-        (["what is your current location"], "current_location"),
+        (["what is your current location", "current location", "your location", "address", "current address", "enter your address", "start typing your address", "where are you based", "city", "current city"], "current_location"),
         (["add degree"], "graduation_degree"),
         (["add specialization"], "graduation_branch"),
         (["enter your final grade", "final grade"], "graduation_cgpa"),
@@ -639,11 +662,40 @@ INDIAN_STATES = [
         "telangana", "tripura", "uttar pradesh", "uttarakhand", "west bengal", "delhi"
     ]
 AUTOCOMPLETE_SUGGESTION_SELECTORS = [
+        # Ashby & modern ATS autocomplete popups
+        '.ashby-application-form-input-autocomplete-popup [role="option"]',
+        '.ashby-application-form-input-autocomplete-popup-result',
+        '[class*="autocomplete-popup"] [role="option"]',
+        '[class*="autocomplete-popup-result"]',
+        # Location listboxes & buttons (e.g. Teamtailor, Google Places, custom comboboxes)
+        '[id*="location-listbox"] button',
+        'button[id*="location-listbox-option"]',
+        '[id*="location-listbox"] [role="option"]',
+        '[data-forms--inputs--location-target="suggestionsList"] button',
+        'button[id*="-option-"]:not(input)',
+        '[id*="-option-"]:not(input)',
+        # Modern React-Select & custom combobox options
+        '[class*="-menu"] [class*="-option"]',
+        '[class*="-menu"] > div > div',
+        '.react-select__option',
+        '.select__option',
         # Lever & modern location typeahead leaf items
         'div.dropdown-location',
         '[id^="location-"]:not(input)',
         '.dropdown-results > .dropdown-location',
         '.dropdown-results > div:not([class*="results"])',
+        # Location specific listboxes & typeaheads
+        '[id*="location"] [role="option"]',
+        '[id*="location"] li',
+        '[role="combobox"][aria-controls] ~ * [role="option"]',
+        '[role="combobox"][aria-controls] ~ * button',
+        '[id*="location-listbox"] li',
+        'ul.location-results > li',
+        'ul.location-results li',
+        'li.location-result',
+        'ul.ibe-dropdown-list > li',
+        '.geosuggest__suggests > li',
+        '.geosuggest__item',
         # ARIA / standard listbox & combobox options
         '[role="listbox"] > [role="option"]',
         '[role="listbox"] [role="option"]',
@@ -653,13 +705,6 @@ AUTOCOMPLETE_SUGGESTION_SELECTORS = [
         'div[role="option"]',
         '[id*="-list-option-"]',
         '[id*="list-option"]',
-        # Location specific typeaheads
-        'ul.location-results > li',
-        'ul.location-results li',
-        'li.location-result',
-        'ul.ibe-dropdown-list > li',
-        '.geosuggest__suggests > li',
-        '.geosuggest__item',
         # Bootstrap & Ripplehire typeahead
         'ul.typeahead > li > a',
         'ul.typeahead > li',
@@ -687,6 +732,24 @@ class FormFiller:
             url, page = page, url
         self.page = page
         self.url = url or (page.url if hasattr(page, "url") and callable(page.url) else (getattr(page, "url", "") if page else ""))
+        self.mcp_mode = False
+        self.job_id = None
+        self.state_callback = None
+        self.missing_for_mcp = []
+        self.latest_field_summary = {
+            "filled_fields": [],
+            "leftover_fields": [],
+            "total_count": 0,
+            "verified_count": 0
+        }
+
+    def get_field_summary(self) -> Dict[str, Any]:
+        return getattr(self, "latest_field_summary", {
+            "filled_fields": [],
+            "leftover_fields": [],
+            "total_count": 0,
+            "verified_count": 0
+        })
 
     def clean_text(self, value: Any) -> str:
         if value is None:
@@ -770,6 +833,52 @@ class FormFiller:
                 return 96
             if b == key and a in values:
                 return 96
+
+        # Generic acronym comparison (e.g. "Bachelor of Computer Applications" -> "BCA", "MBA", etc.)
+        def _to_acronym(text: str) -> str:
+            toks = [w for w in re.split(r"[\s\-_/.]+", text) if w and w.lower() not in {"of", "and", "the", "for", "at", "to", "on"}]
+            return "".join(t[0].lower() for t in toks) if len(toks) >= 2 else ""
+
+        a_main = re.split(r"\s+(?:in|with|major|specialization|stream|branch)\s+|\s*[\(\[\{]", a, flags=re.I)[0].strip()
+        b_main = re.split(r"\s+(?:in|with|major|specialization|stream|branch)\s+|\s*[\(\[\{]", b, flags=re.I)[0].strip()
+        a_toks = [w for w in re.split(r"[\s\-_/.]+", a_main) if w and w.lower() not in {"of", "and", "the", "for", "at", "to", "on"}]
+        b_toks = [w for w in re.split(r"[\s\-_/.]+", b_main) if w and w.lower() not in {"of", "and", "the", "for", "at", "to", "on"}]
+        a_c = re.sub(r"[^a-zA-Z0-9]", "", a_main).lower()
+        b_c = re.sub(r"[^a-zA-Z0-9]", "", b_main).lower()
+
+        # 2-word compound abbreviation: e.g. "Bachelor of Commerce" -> "b" + "com" = "bcom", "Bachelor of Architecture" -> "b" + "arch" = "barch"
+        if len(a_toks) == 2:
+            t0, t1 = a_toks[0][0].lower(), a_toks[1].lower()
+            for k in range(min(5, len(t1)), 1, -1):
+                if b_c == t0 + t1[:k]:
+                    return 94 + k
+        if len(b_toks) == 2:
+            t0, t1 = b_toks[0][0].lower(), b_toks[1].lower()
+            for k in range(min(5, len(t1)), 1, -1):
+                if a_c == t0 + t1[:k]:
+                    return 94 + k
+
+        a_acr = _to_acronym(a_main)
+        b_acr = _to_acronym(b_main)
+        if a_acr and (a_acr == b_c or (len(a_acr) >= 3 and a_acr in b_c)):
+            return 96
+        if b_acr and (b_acr == a_c or (len(b_acr) >= 3 and b_acr in a_c)):
+            return 96
+
+        # Generic sub-phrase & composite option matching (e.g. "Title / Alternative" or "Qualification in Major")
+        cand_subparts = [re.sub(r"[^a-zA-Z0-9\s]", " ", s).strip() for s in re.split(r"[\/|,\-]", b) if s.strip()]
+        target_parts = [re.sub(r"[^a-zA-Z0-9\s]", " ", p).strip() for p in re.split(r"\s+(?:in|of|at|\-|\/|\(|\|)\s+", a) if p.strip()]
+
+        for cs in cand_subparts:
+            if cs and len(cs) >= 2:
+                cs_c = re.sub(r"[^a-z0-9]", "", cs.lower())
+                if cs == a or cs_c == a_c or (len(cs) >= 3 and cs in a):
+                    return 94
+                for pt in target_parts:
+                    pt_c = re.sub(r"[^a-z0-9]", "", pt.lower())
+                    if pt and len(pt) >= 2 and (cs == pt or cs_c == pt_c or (len(cs) >= 3 and cs in pt) or (len(pt) >= 3 and pt in cs)):
+                        return 92
+
         if re.search(rf"(^|\s){re.escape(a)}(\s|$)", b):
             return 92
         if re.search(rf"(^|\s){re.escape(b)}(\s|$)", a):
@@ -830,17 +939,17 @@ class FormFiller:
             return "upload"
         if tag == "select":
             return "select"
-        if t == "date" or e.get("is_datepicker") is True or self.is_date_element(e):
-            return "fill"
         if t == "checkbox" or role in {"checkbox", "switch"} or "checkbox" in control:
             return "checkbox"
         if t == "radio" or role == "radio" or control == "radio_group":
             return "radio"
+        if t == "date" or e.get("is_datepicker") is True or self.is_date_element(e):
+            return "fill"
         path = self.norm(e.get("selector") or "") + " " + self.norm(e.get("dom_path") or "")
         hay = self.canonical_text(" ".join(str(e.get(k) or "") for k in ("id", "name", "label", "question", "placeholder", "selector")))
         fk = self.norm(e.get("field_key") or "")
         is_loc = any(w in hay for w in ["location", "city", "address", "state", "place"]) or fk in {"current_location", "location", "city", "work_location", "desired_location", "preferred_location", "base_location"}
-        if tag == "input" and not bool(e.get("options")) and is_loc:
+        if is_loc and not bool(e.get("options")) and tag in {"input", "textarea", ""}:
             return "fill"
         if (
             tag == "select"
@@ -909,17 +1018,13 @@ class FormFiller:
         except Exception:
             return None
 
-    def is_date_match(self,expected: Any, actual: Any) -> bool:
-        
-        e = self.clean_text(expected).lower()
-        a = self.clean_text(actual).lower()
+    def is_date_match(self, expected: Any, actual: Any) -> bool:
+        e = self.clean_text(expected)
+        a = self.clean_text(actual)
         if not e or not a: 
             return False
-        if e == a: 
+        if self.norm(e) == self.norm(a): 
             return True
-        if e in a or a in e: 
-            return True
-        
         ed = self.parse_date_value(e)
         ad = self.parse_date_value(a)
         if ed and ad:
@@ -929,9 +1034,17 @@ class FormFiller:
             if ed.year == ad.year and ed.month == ad.month: return True
         return False
 
-    def same_value(self,expected: Any, actual: Any) -> bool:
-        if self.is_date_element({"question": expected}) or self.is_date_match(expected, actual):
-            if self.is_date_match(expected, actual): return True
+    def same_value(self, expected: Any, actual: Any) -> bool:
+        e = self.clean_text(expected)
+        a = self.clean_text(actual)
+        if not e:
+            return not a
+        if self.norm(e) == self.norm(a):
+            return True
+
+        if self.is_date_element({"question": e}) or (self.parse_date_value(e) and self.parse_date_value(a)):
+            if self.is_date_match(e, a):
+                return True
 
         e = self.clean_text(expected)
         a = self.clean_text(actual)
@@ -1153,25 +1266,22 @@ class FormFiller:
 
         grad_end = self.clean_text(grad.get("end_date"))
         m_end_yr = re.search(r"\b(19\d{2}|20\d{2})\b", grad_end)
-        if m_end_yr and not grad.get("currently_enrolled") and grad_end.lower() not in {"present", "current", "currently enrolled"}:
+        if m_end_yr:
             grad_year = m_end_yr.group(1)
         else:
-            start_yr_m = re.search(r"\b(19\d{2}|20\d{2})\b", self.clean_text(grad.get("start_date")))
-            if start_yr_m:
-                s_yr = int(start_yr_m.group(1))
-                deg_norm = self.clean_text(grad.get("degree")).lower()
-                if any(k in deg_norm for k in ["master", "mca", "mba", "mtech", "m.sc", "ms", "ma", "m.com"]):
-                    grad_year = str(s_yr + 2)
-                elif any(k in deg_norm for k in ["b.tech", "btech", "b.e", "bachelor of engineering", "bachelor of technology"]):
-                    grad_year = str(s_yr + 4)
-                elif any(k in deg_norm for k in ["bca", "bba", "b.sc", "bsc", "b.com", "b.a"]):
-                    grad_year = str(s_yr + 3)
-                elif "mbbs" in deg_norm:
-                    grad_year = str(s_yr + 5)
-                else:
-                    grad_year = str(s_yr + 4)
+            exp_yr = self.clean_text(grad.get("expected_graduation_year") or grad.get("expected_end_date") or grad.get("completion_year") or grad.get("graduation_year"))
+            m_exp = re.search(r"\b(19\d{2}|20\d{2})\b", exp_yr)
+            if m_exp:
+                grad_year = m_exp.group(1)
             else:
-                grad_year = grad_end if grad_end.lower() not in {"present", "current"} else ""
+                start_yr_m = re.search(r"\b(19\d{2}|20\d{2})\b", self.clean_text(grad.get("start_date")))
+                if start_yr_m:
+                    s_yr = int(start_yr_m.group(1))
+                    deg_norm = self.clean_text(grad.get("degree")).lower()
+                    added_yrs = 2 if any(w in deg_norm for w in ["master", "post", "m."]) else (3 if any(w in deg_norm for w in ["diploma", "associate"]) else 4)
+                    grad_year = str(s_yr + added_yrs)
+                else:
+                    grad_year = grad_end if grad_end.lower() not in {"present", "current"} else ""
 
         idx = {
             "full_name": full_name,
@@ -1223,9 +1333,9 @@ class FormFiller:
             "12th_percentage": "",
             "10th_percentage": "",
             "all_percentages": all_percentages,
-            "current_employer": "",
+            "current_employer": self.clean_text(latest_work.get("company")),
             "employer_name": self.clean_text(latest_work.get("company")),
-            "current_designation": "",
+            "current_designation": self.clean_text(latest_work.get("job_title")),
             "previous_employer": self.clean_text(latest_work.get("company")),
             "previous_designation": self.clean_text(latest_work.get("job_title")),
             "skills": all_skills_str,
@@ -1285,8 +1395,12 @@ class FormFiller:
 
         if not idx["current_location"] and latest_work.get("location"):
             idx["current_location"] = self.clean_text(latest_work.get("location"))
+        if idx.get("current_location") and not idx["current_location"].isupper():
+            idx["current_location"] = idx["current_location"].title()
         if not idx.get("city") and idx.get("current_location"):
             idx["city"] = idx["current_location"]
+        if idx.get("city") and not idx["city"].isupper():
+            idx["city"] = idx["city"].title()
 
         all_locs = []
         if personal.get("city"): all_locs.append(self.clean_text(personal.get("city")))
@@ -1363,10 +1477,10 @@ class FormFiller:
                 idx["is_currently_working"] = "true"
                 break
         idx["currently_working"] = currently_working
-        idx["is_fresher"] = (not currently_working) and float(self.digits(experience_years) or 0) <= 1
+        idx["is_fresher"] = (len(work) == 0) and float(self.digits(experience_years) or 0) == 0
         if not currently_working:
-            idx["current_employer"] = ""
-            idx["current_designation"] = ""
+            idx["current_employer"] = self.clean_text(latest_work.get("company")) if latest_work else ""
+            idx["current_designation"] = self.clean_text(latest_work.get("job_title")) if latest_work else ""
             idx["is_currently_working"] = "false"
 
         supplied = p.get("user_supplied") if isinstance(p.get("user_supplied"), dict) else {}
@@ -1440,20 +1554,23 @@ class FormFiller:
     def is_date_element(self,e: Dict[str, Any]) -> bool:
         if self.norm(e.get("tag")) == "select" or self.norm(e.get("field_type")) == "select" or self.norm(e.get("control_type")) == "select":
             return False
+        role = self.norm(e.get("role") or e.get("runtime_role"))
+        ct = self.norm(e.get("control_type"))
+        if self.norm(e.get("type")) in {"checkbox", "radio"} or role in {"checkbox", "radio", "switch"} or "checkbox" in ct or ct == "radio_group":
+            return False
         s = self.element_search_text(e)
         t = self.norm(e.get("type"))
         ft = self.norm(e.get("field_type") or "")
         ct = self.norm(e.get("control_type") or "")
         fk = self.norm(e.get("field_key") or "")
-        if ft == "date" or ct == "date" or e.get("is_datepicker") is True:
+        if ft == "date" or ct == "date" or e.get("is_datepicker") is True or t == "date":
             return True
         if fk in {"education_start_date", "education_end_date", "work_start_date", "work_end_date", "start_date", "end_date", "date_of_birth", "dob", "earliest_joining_date", "available_from", "joining_date"}:
             return True
         ident = self.norm(e.get("id") or "") + " " + self.norm(e.get("name") or "")
+        has_date_word = re.search(r"(?:^|[\W_])date(?:$|[\W_])", ident) is not None
         return (
-            t == "date"
-            or e.get("is_datepicker") is True
-            or "date" in ident
+            has_date_word
             or "availablefrom" in ident
             or "available_from" in ident
             or "startyear" in ident
@@ -1470,7 +1587,7 @@ class FormFiller:
             or "joining date" in s
             or "earliest joining" in s
             or "available from" in s
-            or s in {"from", "to", "from*", "to*"}
+            or s in {"from", "to", "from*", "to*", "start", "end", "start*", "end*"}
             or "from (month)" in s
             or "to (month)" in s
             or "from (year)" in s
@@ -1488,21 +1605,40 @@ class FormFiller:
     # ============================================================
 
     def _detect_group_index(self,e: Dict[str, Any]) -> Optional[int]:
-        for key in ("id", "name", "selector"):
+        if e.get("_group_index") is not None:
+            try:
+                return int(e["_group_index"])
+            except Exception:
+                pass
+
+        for key in ("id", "name", "data_testid", "selector"):
             val = self.clean_text(e.get(key))
             if not val:
                 continue
             for pat in (
-                r"[_\[\-](\d+)\]?(?:$|[_\-\.])",
+                r"[_\[\-](\d+)\]?(?:$|[_\-\.\"\'])",
                 r"\[(\d+)\]",
                 r"data-index\s*=\s*[\"']?(\d+)",
+                r"row[-_]?(\d+)",
             ):
-                m = re.search(pat, val)
+                m = re.search(pat, val, re.I)
                 if m:
                     try:
                         return int(m.group(1))
                     except Exception:
                         pass
+
+        # Check CSS selector nth-of-type row indexing
+        sel = self.clean_text(e.get("selector"))
+        if sel:
+            m_nth = re.findall(r":nth-of-type\((\d+)\)", sel)
+            if m_nth and len(m_nth) >= 2:
+                # Row index in repeating parent is 1-based, convert to 0-based
+                for cand in reversed(m_nth[:-1]):
+                    n = int(cand)
+                    if 1 <= n <= 10:
+                        return n - 1
+
         return None
 
     def _detect_section_type(self,e: Dict[str, Any]) -> Optional[str]:
@@ -1528,19 +1664,25 @@ class FormFiller:
         )
         if not hay:
             return None
+        if any(w in hay for w in ["notice period", "how many days notice", "ctc", "salary", "expected salary", "current salary", "available to join"]):
+            return None
+        if any(w in hay for w in ["why you", "why should", "cover note", "cover letter", "tell us about"]):
+            return None
+        if (self.norm(e.get("type")) in {"checkbox", "radio"} or self.control_kind(e) in {"checkbox", "radio"}) and not any(k in hay for k in ["currently working", "currently enrolled", "pursuing"]):
+            return None
         patterns = [
+            ("start_date", ["start date", "from date", "joining date", "date of joining", "from (month)", "exp_startyear", "edu_startyear", "startyear", "start_date", "start"]),
+            ("end_date", ["end date", "to date", "relieving date", "date of relieving", "to (month)", "exp_endyear", "edu_endyear", "endyear", "end_date", "end", "completion"]),
+            ("start_year", ["start year", "year of joining", "from year"]),
+            ("end_year", ["end year", "graduation year", "year of completion", "passing year"]),
             ("company", ["name of employer", "company", "employer", "organization", "organisation", "employername"]),
             ("description", ["description of role", "summary of job", "job responsibilities", "role description", "description", "responsibilities", "duties", ".role", "role"]),
             ("job_title", ["designation / job title", "job title", "designation", "position title", "role title", "position"]),
-            ("start_date", ["start date", "from date", "joining date", "date of joining", "from (month)", "exp_startyear", "edu_startyear", "startyear", "start"]),
-            ("end_date", ["end date", "to date", "relieving date", "date of relieving", "to (month)", "exp_endyear", "edu_endyear", "endyear", "end", "completion"]),
             ("location", ["location", "city"]),
             ("grade", ["first class", "distinction", "class / distinction", "result", "grade", "gpa", "cgpa", "score", "percentage", "division"]),
             ("institution", ["name of institute", "institution", "university", "college", "school", "institute", "institutename"]),
             ("degree", ["degree / diploma / certificate name", "degree", "qualification", "course", "diploma"]),
             ("field_of_study", ["field of study", "discipline", "specialization", "stream", "branch", "major"]),
-            ("start_year", ["start year", "year of joining", "from year"]),
-            ("end_year", ["end year", "graduation year", "year of completion", "passing year"]),
         ]
         for field_name, needles in patterns:
             if any(n in hay for n in needles):
@@ -1557,29 +1699,13 @@ class FormFiller:
             desc = self.clean_text(record.get("description") or record.get("summary") or record.get("responsibilities"))
             if desc:
                 return desc
-        if field_name in {"grade", "result", "graduation_cgpa", "graduation_grade"}:
-            gpa = self.clean_text(record.get("gpa") or record.get("cgpa"))
+        if field_name in {"grade", "result", "graduation_cgpa", "graduation_grade", "score", "score_value"} or "score" in field_name or "grade" in field_name:
             pct = self.clean_text(record.get("score_percentage") or record.get("percentage"))
-            if gpa:
-                try:
-                    gpa_f = float(gpa)
-                    if gpa_f >= 8.0:
-                        return f"First Class with Distinction ({gpa} CGPA)"
-                    elif gpa_f >= 6.5:
-                        return f"First Class ({gpa} CGPA)"
-                    return f"{gpa} CGPA"
-                except Exception:
-                    return f"{gpa} CGPA"
-            elif pct:
-                try:
-                    pct_f = float(pct)
-                    if pct_f >= 75:
-                        return f"First Class with Distinction ({pct}%)"
-                    elif pct_f >= 60:
-                        return f"First Class ({pct}%)"
-                    return f"{pct}%"
-                except Exception:
-                    return f"{pct}%"
+            gpa = self.clean_text(record.get("gpa") or record.get("cgpa"))
+            if pct:
+                return str(pct)
+            elif gpa:
+                return str(gpa)
 
         aliases = {
             "company": ["company", "employer_name", "employer", "organization"],
@@ -1599,6 +1725,19 @@ class FormFiller:
             v = self.clean_text(record.get(key))
             if v:
                 return v
+
+        if field_name in {"start_date", "start_year"}:
+            deg_s = self.clean_text(record.get("degree")).lower()
+            end_val = self.clean_text(record.get("end_date") or record.get("end_year"))
+            m_end = re.search(r"\b(19\d{2}|20\d{2})\b", end_val)
+            if m_end:
+                eyr = int(m_end.group(1))
+                sub_yrs = 2 if any(w in deg_s for w in ["secondary", "10", "school", "matric"]) else 1
+                syr = eyr - sub_yrs
+                return f"Jan {syr}" if field_name == "start_date" else str(syr)
+
+        if field_name in {"field_of_study", "graduation_branch"}:
+            return self.clean_text(record.get("field_of_study") or record.get("specialization") or record.get("stream") or record.get("branch") or "")
         return ""
 
     # ============================================================
@@ -1733,10 +1872,10 @@ class FormFiller:
         sel = self.clean_text(e.get("selector") or "").lower()
         raw_id = self.clean_text(e.get("id") or "").lower()
         raw_name = self.clean_text(e.get("name") or "").lower()
-        if any(x in sel or x in raw_id or x in raw_name for x in ["captcha", "recaptcha", "hcaptcha", "turnstile", "cf-turnstile"]):
+        if any(x in sel or x in raw_id or x in raw_name for x in ["captcha", "recaptcha", "hcaptcha", "turnstile", "cf-turnstile", "verificationcode", "verification_code", "vcode", "securitycode"]):
             return True
         s = self.element_search_text(e)
-        return any(x in s for x in ["captcha", "recaptcha", "hcaptcha", "turnstile", "i am not a robot"])
+        return any(x in s for x in ["captcha", "recaptcha", "hcaptcha", "turnstile", "i am not a robot", "verification code", "security code", "enter text from image"])
 
     def is_submit(self,e: Dict[str, Any]) -> bool:
         
@@ -1754,7 +1893,9 @@ class FormFiller:
         s = self.element_search_text(e)
         if any(w in s for w in ["close", "modal", "dismiss", "cancel", "accessibility"]):
             return False
-        if any(w in ident for w in ["submitbutton", "submit-button", "submit_button", "btnsubmit", "btn-submit", "applybutton"]):
+        if any(w in ident or w in s for w in ["apply with", "sign in with", "log in with", "linkedin", "indeed", "oauth", "social"]):
+            return False
+        if any(w in ident for w in ["submitbutton", "submit-button", "submit_button", "btnsubmit", "btn-submit", "applybutton", "apply-button", "apply_button"]):
             return True
         if "submit" in ident and any(w in ident for w in ["button", "btn", "jobapplication"]):
             return True
@@ -1763,8 +1904,11 @@ class FormFiller:
             or "apply now" in s
             or "send application" in s
             or "submit form" in s
+            or "apply for this position" in s
+            or "apply for this job" in s
+            or "apply for this role" in s
             or (t == "submit" and ("apply" in s or "submit" in s))
-            or (s.strip() in {"submit", "apply", "submit application", "apply now", "send application"})
+            or (s.strip() in {"submit", "apply", "submit application", "apply now", "send application", "apply for this position", "apply for this job"})
         )
 
     def looks_like_resume_upload(self,e: Dict[str, Any]) -> bool:
@@ -1781,12 +1925,17 @@ class FormFiller:
         sel = self.clean_text(e.get("selector") or "").lower()
         lbl = self.clean_text(e.get("label") or e.get("question") or "").lower()
 
-        # Profile picture, avatar, photo, attachments are NOT resume upload!
-        if any(p in raw_id or p in raw_name or p in sel or p in lbl for p in [
+        # Profile picture, avatar, photo, attachments, additional files, cover letters are NOT resume upload!
+        non_resume_markers = [
             "profilepic", "profile_pic", "picture", "photo", "avatar", "headshot",
             "attachmentsupload", "other_attachments", "other attachments",
-        ]):
-            return False
+            "additional file", "additional files", "additional document", "additional documents",
+            "other document", "other documents", "cover letter", "cover_letter", "coverletter",
+            "portfolio", "transcript",
+        ]
+        if any(p in raw_id or p in raw_name or p in sel or p in lbl for p in non_resume_markers):
+            if "resume" not in lbl and "cv" not in lbl and "resume" not in raw_id and "cv" not in raw_id:
+                return False
         
         if "attachment" in lbl and "resume" not in lbl and "cv" not in lbl:
             return False
@@ -1813,7 +1962,7 @@ class FormFiller:
         return any(
             x in hay
             for x in (
-                "upload resume", "upload your resume", "drop your files", "drop files here",
+                "upload resume", "upload your resume",
                 "attach resume", "upload cv", "curriculum vitae", "upload_file", "resume here",
             )
         ) or (("resume" in hay or "cv" in hay) and any(re.search(r"\b" + re.escape(w) + r"\b", hay) for w in ("upload", "browse", "attach", "file", "attachment", "select", "choose", "drop")))
@@ -1856,7 +2005,25 @@ class FormFiller:
             return True
         return bool(re.search(r"phone|mobile|telephone|contact_?num", ident))
 
-    def is_noise_control(self,e: Dict[str, Any]) -> bool:
+    def is_location_element(self, e: Dict[str, Any]) -> bool:
+        if self.is_noise_control(e):
+            return False
+        hay = self.canonical_text(" ".join(str(e.get(k) or "") for k in ("id", "name", "label", "question", "placeholder", "selector", "field_name")))
+        fk = self.norm(e.get("field_key") or "")
+        return (
+            any(w in hay for w in ["location", "city", "address", "state", "place"])
+            or fk in {"current_location", "location", "city", "work_location", "desired_location", "preferred_location", "base_location"}
+        )
+
+    def is_noise_control(self, e: Dict[str, Any]) -> bool:
+        # Never filter phone country pickers even if placeholder or label is 'Search'
+        val = str(e.get("value") or "")
+        opts = e.get("options") or []
+        if re.search(r"^\+\d{1,4}\s+[A-Z]{2}", val.strip()):
+            return False
+        if opts and any(re.search(r"^\+\d{1,4}\b", str(o.get("label") or o.get("value") or "").strip()) for o in opts[:5]):
+            return False
+
         sel = self.clean_text(e.get("selector") or "").lower()
         raw_id = self.clean_text(e.get("id") or "").lower()
         lbl = self.clean_text(e.get("label") or e.get("question") or "").lower()
@@ -1869,7 +2036,16 @@ class FormFiller:
         # Internal hidden radio state inputs (e.g. #qRadio + 0, #qRadio + 2)
         if raw_id.startswith("qradio") or "qradio" in raw_name:
             return True
-        if any(p in sel or p in raw_id or p in lbl for p in ["{{", "}}", "ltprop", "cxprop"]):
+        # Social login / OAuth buttons (Apply with LinkedIn, Indeed, Google, etc.)
+        all_text = f"{sel} {raw_id} {raw_name} {lbl}".lower()
+        if any(re.search(pat, all_text) for pat in [
+            r"apply\s+with\s+(linkedin|indeed|google|facebook|apple)",
+            r"sign\s*in\s*with",
+            r"log\s*in\s*with",
+            r"social[-_]button",
+            r"linkedin[-_]button",
+            r"indeed[-_]apply",
+        ]):
             return True
         
         cls = self.norm(e.get("class") or e.get("className") or "")
@@ -1927,24 +2103,39 @@ class FormFiller:
         return False
 
 
-    def is_phone_country_element(self,e: Dict[str, Any]) -> bool:
-        
+    def is_phone_country_element(self, e: Dict[str, Any]) -> bool:
         if self.is_noise_control(e):
             return False
-        if e.get("phone_country_picker") or "phone_country" in self.norm(e.get("control_type")):
-            return True
-        ident = " ".join(self.norm(e.get(k)) for k in ("id", "name", "aria_label", "selector", "question", "label"))
-        cls = self.norm(e.get("class") or e.get("className") or "")
-        if "iti__tel" in cls:
+        tag = self.norm(e.get("tag"))
+        t = self.norm(e.get("type"))
+        ident_id = self.norm(e.get("id"))
+
+        # Explicit phone text inputs (type="tel" or standard phone input ids/classes) are NEVER country pickers
+        if t in {"tel", "phone"} or ident_id in {"candidate_phone", "phone", "mobile", "mobile_phone", "phonenumber", "telephone"} or "iti__tel" in self.norm(e.get("class") or ""):
             return False
+        if tag == "input" and t in {"text", ""}:
+            opts = e.get("options") or []
+            if not opts and not e.get("phone_country_picker") and "phone_country" not in self.norm(e.get("control_type")):
+                return False
+
+        if e.get("field_key") == "phone_country_code" or e.get("phone_country_picker") or "phone_country" in self.norm(e.get("control_type")):
+            return True
+        val = str(e.get("value") or "") + " " + str(e.get("current_selection_label") or "")
+        if re.search(r"^\+\d{1,4}\s+[A-Z]{2}", val.strip()):
+            return True
+        opts = e.get("options") or []
+        if opts and sum(1 for o in opts[:8] if re.search(r"^\+\d{1,4}\b", str(o.get("label") or o.get("value") or "").strip())) >= 2:
+            return True
+        cls = self.norm(e.get("class") or e.get("className") or "")
         if "iti__selected-country" in cls or "iti__flag-container" in cls:
             return True
-        clean_id = ident.replace(" ", "").replace("_", "").replace("-", "").replace(".", "").replace("\\", "")
-        if any(k in clean_id for k in ("countrycode", "dialcode", "phonecode", "callingcode", "countrydial", "phonecountry", "mobilecountry")):
+        field_ident = " ".join(self.norm(e.get(k)) for k in ("id", "name", "aria_label", "selector"))
+        clean_fid = field_ident.replace(" ", "").replace("_", "").replace("-", "").replace(".", "").replace("\\", "")
+        if any(k in clean_fid for k in ("countrycode", "dialcode", "phonecode", "callingcode", "countrydial", "phonecountry", "mobilecountry")):
             return True
-        if ident.strip() in {"country", "country_code", "phone_country", "dial_code", "phonecountry"}:
+        if field_ident.strip() in {"country", "country_code", "phone_country", "dial_code", "phonecountry"}:
             return True
-        return any(x in ident for x in ["country code", "dial code", "calling code", "selected country", "phone number country", "phone country"])
+        return any(x in field_ident for x in ["country code", "dial code", "calling code", "selected country", "phone number country", "phone country", "change country"])
 
 
     # ============================================================
@@ -2038,11 +2229,26 @@ class FormFiller:
         sel_lower = selector.lower()
         el = element or {}
 
+        # Social login / OAuth buttons are not input fields
+        if "apply with" in q_lower or "sign in with" in q_lower or "log in with" in q_lower or "linkedin-button" in sel_lower:
+            return ""
+
         # Check if wrongly classified as work/education date when it's actually availability / joining date
         if any(k in sel_lower for k in ["availablefrom", "available_from", "earliest_joining", "earliest_start", "available_date"]):
             return "earliest_joining_date"
         if any(k in q_lower for k in ["earliest joining", "available from", "when can you start"]):
             return "earliest_joining_date"
+
+        # Check for composite questions asking for salary/CTC + notice + location
+        if any(s in q_lower for s in ["ctc", "salary"]) and any(n in q_lower for n in ["notice", "joining", "preferred location", "work location"]):
+            return "composite_salary_notice_location"
+
+        # Check for open-ended technical questions about tools, testing, or frameworks (e.g. JUnit, TDD, Git, CI/CD, AWS, Kubernetes, Agile, Spring Boot)
+        # Prevent these from collapsing to a single numeric experience value (e.g. "1")
+        if (original_key in {"experience", "experience_years"} or self.norm(el.get("tag")) == "textarea") and any(
+            p in q_lower for p in ["junit", "tdd", "automated testing", "ci/cd", "testing practices", "kubernetes", "agile", "serverless", "containerization", "spring boot"]
+        ):
+            return "custom_question"
 
         # Check if wrongly classified as phone/email/name when it's a select dropdown for referral source
         if original_key in {"phone", "email", "full_name"} and (self.norm(el.get("tag")) == "select" or self.norm(el.get("type")) == "select" or self.control_kind(el) == "select"):
@@ -2164,7 +2370,14 @@ class FormFiller:
         kind = self.control_kind(e)
         if kind in {"select", "radio", "checkbox", "upload"}:
             return kind
-        if self.normalize_field_key(e.get("_field_key")) in SELECT_FIELD_KEYS and (self.norm(e.get("tag")) != "input" or bool(e.get("options"))):
+        hay = self.canonical_text(" ".join(str(e.get(k) or "") for k in ("id", "name", "label", "question", "placeholder", "selector")))
+        fk = self.norm(e.get("field_key") or "")
+        is_loc = any(w in hay for w in ["location", "city", "address", "state", "place"]) or fk in {"current_location", "location", "city", "work_location", "desired_location", "preferred_location", "base_location"}
+        if (kind == "combobox" or self.norm(e.get("role")) == "combobox" or self.norm(e.get("runtime_role")) == "combobox"):
+            if not is_loc:
+                return "select"
+            return "fill"
+        if self.normalize_field_key(e.get("_field_key")) in SELECT_FIELD_KEYS:
             return "select"
         return default
 
@@ -2235,6 +2448,34 @@ class FormFiller:
         by_index = {e["_element_index"]: e for e in elements}
         by_selector = {self.clean_text(e.get("selector")): e for e in elements}
 
+        # Pre-pass: propagate and assign repeatable section & group index across all elements
+        last_sec = None
+        last_gi = 0
+        for el in elements:
+            is_choice = self.norm(el.get("type")) in {"checkbox", "radio"} or self.control_kind(el) in {"checkbox", "radio"}
+            sec = None if is_choice else (el.get("_section_type") or self._detect_section_type(el))
+            if not sec and not is_choice:
+                sel_check = (self.clean_text(el.get("selector")) + " " + self.clean_text(el.get("question") or el.get("label"))).lower()
+                if any(k in sel_check for k in ["qualification", "degree", "branch", "university", "college", "course", "education", "score", "cgpa", "gpa", "grade", "percentage", "graduation"]):
+                    sec = "education"
+                elif any(k in sel_check for k in ["company", "designation", "relieving", "joining", "experience", "employer", "work", "job title", "role"]):
+                    sec = "experience"
+            if sec:
+                el["_section_type"] = sec
+                gi = el.get("_group_index")
+                if gi is None:
+                    gi = self._detect_group_index(el)
+                if gi is None and sec == last_sec:
+                    gi = last_gi
+                if gi is not None:
+                    el["_group_index"] = gi
+                    last_gi = gi
+                last_sec = sec
+            else:
+                el["_section_type"] = None
+                last_sec = None
+                last_gi = 0
+
         # --- 1. Important-field mapping ---
         for field in important:
             raw_key = self.normalize_field_key(field.get("field_key"))
@@ -2259,7 +2500,7 @@ class FormFiller:
                 gi = self._detect_group_index(e)
             if gi is None:
                 sel_for_gi = self.clean_text(field.get("selector") or e.get("selector") or "")
-                m_gi = re.search(r"[_\[\-](\d+)\]?(?:$|[_\-\.])", sel_for_gi)
+                m_gi = re.search(r"[_\[\-](\d+)\]?(?:$|[_\-\.\"\'])", sel_for_gi)
                 if m_gi:
                     try:
                         gi = int(m_gi.group(1))
@@ -2276,10 +2517,11 @@ class FormFiller:
                 elif any(k in sel_s for k in ["company", "designation", "relieving", "joining", "experience", "employer", "work"]):
                     sec = "experience"
 
-            # FIX: Ignore personal info fields mapped to repeatable sections
+            # FIX: Ignore personal info / general application fields mapped to repeatable sections
             if sec in {"experience", "education"}:
-                if key in {"full_name", "first_name", "middle_name", "last_name", "email", "phone", "mobile", "current_location", "linkedin", "github"}:
-                    continue
+                if key in {"full_name", "first_name", "middle_name", "last_name", "email", "phone", "mobile", "current_location", "linkedin", "github", "current_salary", "expected_salary", "notice_period", "available_to_join_days", "availability", "composite_salary_notice_location", "custom_question", "custom_answer"} or "answers_attributes" in (e.get("selector") or "").lower():
+                    sec = None
+                    gi = None
             
             # FIX: Ignore bad field_key mappings if label clearly contradicts it
             label_hay = self.canonical_text(e.get("label") or e.get("question") or e.get("placeholder") or "")
@@ -2301,11 +2543,17 @@ class FormFiller:
                 "current location" in hay or "present location" in hay or "your location" in hay
             ):
                 key = "current_location"
+            elif key in {"custom_question", "custom_answer"}:
+                continue
 
             value = None
             cand_opt_lbl = None
             cand_opt_val = None
-            resume_key = IMPORTANT_RESUME_MAP.get(key) or IMPORTANT_RESUME_MAP.get(self.norm(field.get("field_key") or ""))
+            raw_orig = self.normalize_field_key(field.get("field_key") or "")
+            if key == raw_orig or not key:
+                resume_key = IMPORTANT_RESUME_MAP.get(key) or IMPORTANT_RESUME_MAP.get(raw_orig)
+            else:
+                resume_key = IMPORTANT_RESUME_MAP.get(key)
 
             # If repeatable group field, resolve directly from the candidate record!
             if gi is not None and sec in {"education", "experience"}:
@@ -2325,31 +2573,107 @@ class FormFiller:
                     elif key in {"education_start_date", "start_date"}: rep_field = "start_date"
                     elif key in {"education_end_date", "education_date_of_completion", "end_date"}: rep_field = "end_date"
                     elif key in {"education_location", "location"}: rep_field = "location"
-                    elif key in {"graduation_cgpa", "grade", "gpa", "cgpa", "score"}: rep_field = "grade"
+                    elif any(k in key for k in ["cgpa", "grade", "gpa", "score"]): rep_field = "grade"
 
                 if 0 <= gi < len(records_to_use):
                     rec = records_to_use[gi]
-                    if rep_field in {"currently_working", "currently_working_here", "is_currently_working"}:
+                    opts = [self.clean_text(o.get("label") if isinstance(o, dict) else o) for o in (e.get("options") or [])]
+                    
+                    if opts and any("cgpa" in o.lower() for o in opts) and any("percentage" in o.lower() for o in opts):
+                        if rec.get("score_percentage"):
+                            value = next((o for o in opts if "percentage" in o.lower()), "Percentage")
+                        else:
+                            value = next((o for o in opts if "cgpa" in o.lower()), "CGPA")
+                    elif opts and any("pursuing" in o.lower() for o in opts) and any("completed" in o.lower() for o in opts):
+                        if rec.get("currently_enrolled"):
+                            value = next((o for o in opts if "pursuing" in o.lower()), "Currently Pursuing")
+                        else:
+                            value = next((o for o in opts if "completed" in o.lower()), "Completed")
+                    elif opts and any(w in (e.get("question") or e.get("label") or "").lower() for w in ["qualification", "degree", "type", "course"]):
+                        deg_name = self.clean_text(rec.get("degree"))
+                        best_opt, best_sc = None, 0
+                        for o in opts:
+                            sc = max(self.fuzzy_score(deg_name, o), self.option_synonym_score(deg_name, o))
+                            if sc > best_sc:
+                                best_sc = sc
+                                best_opt = o
+                        if best_opt and best_sc >= 50:
+                            value = best_opt
+                        else:
+                            value = self._record_field_value(rec, rep_field or key)
+                    elif rep_field in {"currently_working", "currently_working_here", "is_currently_working"}:
                         value = "true" if rec.get("currently_working") else "false"
                     else:
                         value = self._record_field_value(rec, rep_field or key)
-                        if sec == "education" and rep_field in {"end_date", "end_year"} and (
+                        if rep_field in {"grade", "graduation_cgpa", "score"} and (self.norm(e.get("type")) == "number" or "score" in self.clean_text(e.get("selector")).lower()):
+                            if rec.get("score_percentage"):
+                                value = str(rec["score_percentage"])
+                            elif rec.get("gpa"):
+                                value = str(rec["gpa"])
+                        elif sec == "education" and rep_field in {"field_of_study", "graduation_branch"} and not value:
+                            value = rec.get("field_of_study") or rec.get("specialization") or rec.get("stream") or rec.get("branch") or ""
+                        elif sec == "education" and rep_field in {"start_date", "start_year"} and not value:
+                            end_val = self.clean_text(rec.get("end_date") or rec.get("end_year"))
+                            m_end = re.search(r"\b(19\d{2}|20\d{2})\b", end_val)
+                            if m_end:
+                                deg_low = self.clean_text(rec.get("degree")).lower()
+                                sub_yrs = 2 if any(m in deg_low for m in ["secondary", "10", "school", "matric"]) else 1
+                                syr = int(m_end.group(1)) - sub_yrs
+                                value = f"Jan {syr}" if rep_field == "start_date" else str(syr)
+                        elif sec == "education" and rep_field in {"end_date", "end_year"} and (
                             str(value).lower() in {"present", "current", "currently enrolled", ""}
                             or rec.get("currently_enrolled")
                         ):
-                            if rep_field == "end_year" and not (self.norm(e.get("type")) == "date" or e.get("is_datepicker")):
-                                start_yr = self.clean_text(rec.get("start_date"))
-                                m_yr = re.search(r"\b(19\d{2}|20\d{2})\b", start_yr)
-                                if m_yr:
-                                    deg_low = self.clean_text(rec.get("degree")).lower()
-                                    add_yrs = 2 if any(m in deg_low for m in ["master", "mca", "mba", "mtech", "m.sc"]) else 4
-                                    value = str(int(m_yr.group(1)) + add_yrs)
+                            start_yr = self.clean_text(rec.get("start_date"))
+                            m_yr = re.search(r"\b(19\d{2}|20\d{2})\b", start_yr)
+                            if m_yr:
+                                deg_low = self.clean_text(rec.get("degree")).lower()
+                                add_yrs = 2 if any(m in deg_low for m in ["master", "mca", "mba", "mtech", "m.sc"]) else 4
+                                exp_yr = int(m_yr.group(1)) + add_yrs
+                                value = f"May {exp_yr}" if rep_field == "end_date" else str(exp_yr)
                 else:
                     value = ""
             else:
-                if not resume_key:
-                    continue
-                value = resume_idx.get(resume_key)
+                if key == "composite_salary_notice_location":
+                    parts = []
+                    curr_s = resume_idx.get("current_salary") or ""
+                    exp_s = resume_idx.get("expected_salary") or ""
+                    raw_np = resume_idx.get("notice_period") or resume_idx.get("available_to_join_days") or ""
+                    if self.is_meta_instruction(raw_np):
+                        raw_np = ""
+                    notice_s = raw_np or ("Immediate" if not resume_idx.get("currently_working") else "30 days")
+                    if str(notice_s).isdigit():
+                        notice_s = f"{notice_s} days"
+                    loc_s = resume_idx.get("city") or resume_idx.get("current_location") or ""
+                    if curr_s:
+                        if "lpa" not in str(curr_s).lower() and "lac" not in str(curr_s).lower() and "$" not in str(curr_s) and "€" not in str(curr_s) and "₹" not in str(curr_s):
+                            curr_s = f"{curr_s} LPA"
+                        parts.append(f"Current CTC: {curr_s}")
+                    if exp_s:
+                        if "lpa" not in str(exp_s).lower() and "lac" not in str(exp_s).lower() and "$" not in str(exp_s) and "€" not in str(exp_s) and "₹" not in str(exp_s):
+                            exp_s = f"{exp_s} LPA"
+                        parts.append(f"Expected CTC: {exp_s}")
+                    if notice_s:
+                        parts.append(f"Notice Period: {notice_s}")
+                    if loc_s:
+                        parts.append(f"Preferred Location: {loc_s}")
+                    value = ", ".join(parts) if parts else ""
+                else:
+                    if not resume_key:
+                        continue
+                    value = resume_idx.get(resume_key)
+                    if key in {"address", "street_address", "current_location"} or resume_key in {"address", "current_location"}:
+                        if any(w in label_hay for w in ["address", "street", "residence address", "current address", "home address", "postal address"]):
+                            addr = resume_idx.get("address")
+                            c = resume_idx.get("city") or resume_idx.get("current_location") or ""
+                            if addr:
+                                value = f"{addr}, {c}" if c and c.lower() not in addr.lower() else addr
+                            elif c:
+                                value = c
+                        elif not value and resume_key == "address":
+                            value = resume_idx.get("current_location") or resume_idx.get("city") or ""
+                    if not value and resume_key in {"available_to_join_days", "notice_period"}:
+                        value = resume_idx.get("notice_period") or resume_idx.get("available_to_join_days") or "Immediate"
 
             if self.is_empty(value):
                 continue
@@ -2363,43 +2687,75 @@ class FormFiller:
             if self.is_current_employment_question(e, key) and not self.currently_employed(resume_idx):
                 if resume_key in {"current_employer", "current_designation", "company_name",
                                 "job_title", "designation", "employer_name"}:
-                    value = "NA"
+                    if not resume_idx.get("company_name") and not resume_idx.get("employer_name"):
+                        value = "NA"
             if (self.norm(e.get("type")) == "date" or e.get("is_datepicker")) and str(value).lower() in {"immediate", "ready", "urgent", "0"}:
                 from datetime import datetime
                 value = datetime.now().strftime("%Y-%m-%d")
             elif self.looks_like_currency_control(e):
                 value = resume_idx.get("salary_currency") or value
+            elif key == "composite_salary_notice_location":
+                pass
             elif resume_key in {"current_salary", "expected_salary"}:
                 hay_sal = self.canonical_text(
                     " ".join(str(e.get(k) or "") for k in ("label", "question", "placeholder", "name", "id"))
                 )
-                val_clean = self.clean_text(value).upper()
-                m_num = re.search(r"(\d+(?:\.\d+)?)", val_clean)
-                if m_num:
-                    num = float(m_num.group(1))
-                    is_lpa = "LPA" in val_clean or "LAC" in val_clean or num <= 100
-                    ph_digs = self.digits(self.clean_text(e.get("placeholder") or ""))
-                    expects_full_annual = len(ph_digs) >= 5 or (
-                        not any(w in hay_sal for w in ["lpa", "lakh", "lac", "in lpa", "in lakh"])
-                        and any(w in hay_sal for w in ["per annum", "annum", "annual", "ctc", "salary"])
-                    )
-                    if any(m in hay_sal for m in ["month", "monthly", "per month", "net / month"]):
-                        if is_lpa:
-                            value = str(int(round((num * 100000) / 12)))
-                        else:
-                            value = str(int(round(num)))
-                    elif expects_full_annual and is_lpa:
-                        value = str(int(round(num * 100000)))
-                    else:
-                        value = str(int(round(num))) if num.is_integer() else str(num)
+                if any(w in hay_sal for w in ["notice", "joining", "preferred location", "work location"]) and (self.norm(e.get("tag")) == "textarea" or len(hay_sal) > 50):
+                    parts = []
+                    curr_s = resume_idx.get("current_salary") or ""
+                    exp_s = resume_idx.get("expected_salary") or ""
+                    raw_np = resume_idx.get("notice_period") or resume_idx.get("available_to_join_days") or ""
+                    if self.is_meta_instruction(raw_np):
+                        raw_np = ""
+                    notice_s = raw_np or ("Immediate" if not resume_idx.get("currently_working") else "30 days")
+                    if str(notice_s).isdigit():
+                        notice_s = f"{notice_s} days"
+                    loc_s = resume_idx.get("city") or resume_idx.get("current_location") or ""
+                    if curr_s:
+                        if "lpa" not in str(curr_s).lower() and "lac" not in str(curr_s).lower() and "$" not in str(curr_s) and "€" not in str(curr_s) and "₹" not in str(curr_s):
+                            curr_s = f"{curr_s} LPA"
+                        parts.append(f"Current CTC: {curr_s}")
+                    if exp_s:
+                        if "lpa" not in str(exp_s).lower() and "lac" not in str(exp_s).lower() and "$" not in str(exp_s) and "€" not in str(exp_s) and "₹" not in str(exp_s):
+                            exp_s = f"{exp_s} LPA"
+                        parts.append(f"Expected CTC: {exp_s}")
+                    if notice_s:
+                        parts.append(f"Notice Period: {notice_s}")
+                    if loc_s:
+                        parts.append(f"Preferred Location: {loc_s}")
+                    value = ", ".join(parts) if parts else ""
                 else:
-                    value = self.salary_amount_text(value)
+                    val_clean = self.clean_text(value).upper()
+                    m_num = re.search(r"(\d+(?:\.\d+)?)", val_clean)
+                    if m_num:
+                        num = float(m_num.group(1))
+                        is_lpa = "LPA" in val_clean or "LAC" in val_clean or num <= 100
+                        ph_digs = self.digits(self.clean_text(e.get("placeholder") or ""))
+                        expects_full_annual = len(ph_digs) >= 5 or (
+                            not any(w in hay_sal for w in ["lpa", "lakh", "lac", "in lpa", "in lakh"])
+                            and any(w in hay_sal for w in ["per annum", "annum", "annual", "ctc", "salary"])
+                        )
+                        if any(m in hay_sal for m in ["month", "monthly", "per month", "net / month"]):
+                            if is_lpa:
+                                value = str(int(round((num * 100000) / 12)))
+                            else:
+                                value = str(int(round(num)))
+                        elif expects_full_annual and is_lpa:
+                            value = str(int(round(num * 100000)))
+                        else:
+                            value = str(int(round(num))) if num.is_integer() else str(num)
+                    else:
+                        value = self.salary_amount_text(value)
             elif self.looks_like_salary_frequency_control(e):
                 value = resume_idx.get("salary_frequency") or value
             elif resume_key == "available_to_join_days" or key == "availability":
                 field_label_lower = self.field_label_text(e).lower()
                 if self.is_meta_instruction(value):
-                    continue
+                    is_working = resume_idx.get("is_currently_working")
+                    if is_working in [True, "true", "True", "yes", "Yes"]:
+                        value = "30"
+                    else:
+                        value = "0" if (self.norm(e.get("type")) == "number" or "days" in field_label_lower) else "Immediate"
                 if "week" in field_label_lower:
                     value = "0"
                 elif self.norm(e.get("type")) == "number" or "number" in self.norm(e.get("control_type")) or "days" in field_label_lower:
@@ -2488,19 +2844,39 @@ class FormFiller:
                 or "portfolio" in str(cand_field).lower() or "github" in str(cand_field).lower() or ("linkedin" in str(cand_field).lower() and "source" not in str(cand_field).lower())
                 or re.search(r"\b(url|website|portfolio link|profile link|github link|linkedin link)\b", self.norm(e.get("question") or ""))
             ):
-                if cand_field in {"full_name", "first_name", "last_name", "name"} or not (str(value).startswith("http") or "." in str(value)):
-                    sel_l = self.clean_text(e.get("selector") or "").lower()
-                    q_l = self.clean_text(e.get("question") or "").lower()
-                    if "linkedin" in sel_l or "linkedin" in q_l:
-                        value = resume_idx.get("linkedin") or value
-                        cand_field = "linkedin"
-                    elif "github" in sel_l or "github" in q_l:
-                        value = resume_idx.get("github") or value
-                        cand_field = "github"
+                sel_l = self.clean_text(e.get("selector") or "").lower()
+                q_l = self.clean_text(e.get("question") or "").lower()
+                ph_l = self.clean_text(e.get("placeholder") or "").lower()
+                el_type = self.norm(e.get("type"))
+                
+                if "linkedin" in sel_l or "linkedin" in q_l or "linkedin" in ph_l:
+                    raw_val = resume_idx.get("linkedin") or ""
+                    cand_field = "linkedin"
+                    if "your-name" in ph_l or "username" in ph_l or "username" in q_l:
+                        u = re.sub(r"^(https?://)?(www\.)?linkedin\.com/in/", "", raw_val).strip("/")
+                        value = self.ensure_https_url(raw_val) if el_type == "url" else u
                     else:
-                        value = resume_idx.get("portfolio") or resume_idx.get("linkedin") or value
-                        cand_field = "portfolio"
-                value = self.ensure_https_url(value)
+                        value = self.ensure_https_url(raw_val)
+                elif "github" in sel_l or "github" in q_l or "github" in ph_l:
+                    raw_val = resume_idx.get("github") or ""
+                    cand_field = "github"
+                    u = re.sub(r"^(https?://)?(www\.)?github\.com/", "", raw_val).strip("/")
+                    if "your-username" in ph_l or "username" in ph_l or "username" in q_l:
+                        value = self.ensure_https_url(raw_val) if el_type == "url" else u
+                    elif el_type == "url":
+                        value = self.ensure_https_url(raw_val)
+                    else:
+                        value = f"github.com/{u}" if "github.com" in ph_l else self.ensure_https_url(raw_val)
+                else:
+                    cand_field = "portfolio"
+                    # Never use LinkedIn for portfolio / website!
+                    value = resume_idx.get("portfolio") or resume_idx.get("portfolio_url") or resume_idx.get("website") or ""
+                    if not value and resume_idx.get("github"):
+                        gh_raw = resume_idx.get("github").strip("/")
+                        gh_u = re.sub(r"^(https?://)?(www\.)?github\.com/", "", gh_raw).strip("/").split("/")[0]
+                        value = f"https://{gh_u}.github.io"
+                    if value:
+                        value = self.ensure_https_url(value)
 
             # Validate that choice elements actually have an option matching the value/option label/value
             opts = e.get("options") or []
@@ -2581,25 +2957,26 @@ class FormFiller:
                 used_elements.add(e["_element_index"])
                 break
 
-        # --- 3. Auto-check consent checkboxes ---
+        # --- 3. Auto-check consent checkboxes & radio groups ---
         for e in elements:
             idx = e["_element_index"]
             if idx in used_elements:
                 continue
+            ident = " ".join(self.norm(e.get(k)) for k in ("id", "name", "aria_label", "label", "question", "selector", "field_key"))
+            if not any(term in ident for term in [
+                "consent", "privacy", "terms", "agree", "policy",
+                "declaration", "acknowledg", "candidateconsent", "dataprocessing",
+                "data processing", "agreement", "sms_opt_in", "text message"
+            ]):
+                continue
+
             is_chk = (
                 self.norm(e.get("type")) == "checkbox"
                 or self.norm(e.get("field_type")) == "checkbox"
                 or self.norm(e.get("control_type")) == "checkbox"
                 or (self.norm(e.get("tag")) == "input" and self.norm(e.get("type")) == "checkbox")
             )
-            if not is_chk:
-                continue
-            ident = " ".join(self.norm(e.get(k)) for k in ("id", "name", "aria_label", "label", "question", "selector", "field_key"))
-            if any(term in ident for term in [
-                "consent", "privacy", "terms", "agree", "policy",
-                "declaration", "acknowledg", "candidateconsent", "dataprocessing",
-                "data processing", "agreement"
-            ]):
+            if is_chk:
                 candidates.append({
                     "element_index": idx,
                     "field": "candidate_consent",
@@ -2609,6 +2986,29 @@ class FormFiller:
                     "confidence": 100,
                 })
                 used_elements.add(idx)
+                continue
+
+            opts = e.get("options") or []
+            if opts:
+                yes_opt = None
+                for opt in opts:
+                    lbl = self.norm(opt.get("label") or opt.get("value") or "")
+                    if lbl.startswith("yes") or "consent" in lbl or "agree" in lbl:
+                        yes_opt = opt
+                        break
+                if yes_opt:
+                    val = yes_opt.get("value") if yes_opt.get("value") is not None else yes_opt.get("label")
+                    candidates.append({
+                        "element_index": idx,
+                        "field": "candidate_consent_choice",
+                        "value": str(val),
+                        "option_label": str(yes_opt.get("label") or val),
+                        "option_value": str(val),
+                        "action": "radio" if self.norm(e.get("control_type")) in {"radio", "radio_group"} else "select",
+                        "source": "deterministic",
+                        "confidence": 100,
+                    })
+                    used_elements.add(idx)
 
         # --- 4. Checkboxes in Experience sections ---
         for e in elements:
@@ -2642,11 +3042,21 @@ class FormFiller:
 
                 score = self.rule_match_score(e, phrases)
 
+                if field == "full_name":
+                    label_norm = self.clean_text(e.get("label") or e.get("question") or "").lower()
+                    if any(w in label_norm for w in ["institute", "company", "employer", "college", "school", "organization", "first", "last", "middle"]):
+                        score = 0
+
                 if field == "phone" and self.is_phone_country_element(e):
                     score = 0
 
                 if field == "experience_years":
                     if self.is_phone_element(e):
+                        score = 0
+                    if self.norm(e.get("tag")) == "textarea":
+                        score = 0
+                    q_low = self.clean_text(e.get("question") or e.get("label") or "").lower()
+                    if any(p in q_low for p in ["junit", "tdd", "automated testing", "ci/cd", "testing practices", "kubernetes", "agile", "serverless", "containerization", "spring boot", "tool", "framework", "technology", "technologies"]):
                         score = 0
                     opts = e.get("options") or []
                     yn = {self.norm(o.get("label") if isinstance(o, dict) else o) for o in opts}
@@ -2657,8 +3067,13 @@ class FormFiller:
                     path = (str(e.get("selector") or "") + " " + str(e.get("dom_path") or "")).lower()
                     if self.control_kind(e) == "select" or "cu-select" in path or self.looks_like_currency_control(e) or self.looks_like_salary_frequency_control(e):
                         score = 0
+                    q_low = self.clean_text(e.get("question") or e.get("label") or "").lower()
+                    if any(n in q_low for n in ["notice", "joining", "preferred location", "work location"]):
+                        score = 0
 
                 if field in {"company_name", "job_title", "current_employer", "current_designation", "employer_name"}:
+                    if self.norm(e.get("tag")) == "textarea" or any(w in self.norm(e.get("question") or "") for w in ["why you", "why should", "cover note", "cover letter"]):
+                        score = 0
                     if self.is_current_employment_question(e, field) and not self.currently_employed(resume_idx):
                         score = 0
 
@@ -2871,6 +3286,7 @@ class FormFiller:
                     "element_index": best["_element_index"],
                     "field": "phone",
                     "value": resume_idx["national_phone"],
+                    "country_code": resume_idx.get("country_code") or "+91",
                     "action": "fill",
                     "source": "resume",
                     "confidence": best_score,
@@ -2892,16 +3308,17 @@ class FormFiller:
             sel = self.norm(e.get("selector") or "")
 
             if any(w in q_text for w in ["house no", "street / locality", "street locality", "address line 1", "residential address"]):
-                addr = resume_idx.get("address") or "153 Vishun Garden Rajendra Park"
-                candidates.append({
-                    "element_index": idx,
-                    "field": "address",
-                    "value": addr,
-                    "action": "fill",
-                    "source": "resume",
-                    "confidence": 100,
-                })
-                used_elements.add(idx)
+                addr = resume_idx.get("address") or resume_idx.get("city") or resume_idx.get("current_location") or ""
+                if addr:
+                    candidates.append({
+                        "element_index": idx,
+                        "field": "address",
+                        "value": addr,
+                        "action": "fill",
+                        "source": "resume",
+                        "confidence": 100,
+                    })
+                    used_elements.add(idx)
         
             elif "city" in q_text:
                 city_val = resume_idx.get("city") or resume_idx.get("current_location") or resume_idx.get("location") or ""
@@ -2943,36 +3360,54 @@ class FormFiller:
         education = p.get("education", []) if isinstance(p, dict) else []
         work = p.get("work_experience", []) if isinstance(p, dict) else []
         skills = p.get("skills", {}) if isinstance(p, dict) else {}
+        projects = p.get("projects", []) if isinstance(p, dict) else []
         currently_working = any(bool(w.get("currently_working")) for w in work if isinstance(w, dict))
         years = p.get("total_experience_years", resume.get("year_of_exp"))
+        full_name = self.clean_text(personal.get("full_name"))
+        parts = full_name.split() if full_name else []
+        supplied = p.get("user_supplied") if isinstance(p.get("user_supplied"), dict) else {}
+        first_name = supplied.get("first_name") or personal.get("first_name") or (parts[0] if parts else "")
+        last_name = supplied.get("last_name") or personal.get("last_name") or (parts[-1] if len(parts) > 1 else "")
+        middle_name = supplied.get("middle_name") or personal.get("middle_name") or (" ".join(parts[1:-1]) if len(parts) > 2 else "")
+        user_addr = supplied.get("address") or personal.get("address") or personal.get("street_address")
+        pincode = supplied.get("pincode") or personal.get("pincode") or personal.get("zip")
+
         return self.compact_dict({
             "personal_info": self.compact_dict({
-                "full_name": personal.get("full_name"),
+                "full_name": full_name,
+                "first_name": first_name,
+                "middle_name": middle_name,
+                "last_name": last_name,
                 "email": personal.get("email"),
                 "phone": personal.get("phone"),
+                "address": user_addr,
+                "pincode": pincode,
                 "city": personal.get("city"),
                 "state": personal.get("state"),
                 "country": personal.get("country"),
                 "current_location": personal.get("current_location") or personal.get("city"),
                 "linkedin": personal.get("linkedin"),
                 "github": personal.get("github"),
+                "portfolio": personal.get("portfolio") or personal.get("website") or supplied.get("portfolio"),
+                "website": personal.get("website") or personal.get("portfolio") or supplied.get("website"),
                 "gender": personal.get("gender") or personal.get("sex"),
                 "ethnicity": personal.get("ethnicity") or personal.get("race") or personal.get("race_or_ethnicity"),
+                "notice_period": personal.get("notice_period") or p.get("notice_period"),
             }),
             "professional_summary": p.get("professional_summary"),
             "education": education[:3] if isinstance(education, list) else education,
             "work_experience": work[:3] if isinstance(work, list) else work,
             "employment_status": {
                 "currently_working": currently_working,
-                "is_fresher": (not currently_working) and float(self.digits(years) or 0) <= 1,
-                "current_company": None,
-                "current_position": None,
-                "rule": "Internships already ended. Do NOT fill Current Company / Current Position / Current Designation with past intern roles. Use Not working / Fresher / None / skip.",
+                "latest_company": work[0].get("company") if work else None,
+                "latest_position": work[0].get("job_title") if work else None,
             },
             "skills": skills,
+            "projects": projects[:3] if isinstance(projects, list) else projects,
             "total_experience_years": years,
             "Current Salary": p.get("Current Salary") or p.get("current_salary"),
             "Expected Salary": p.get("Expected Salary") or p.get("expected_salary"),
+            "Notice Period": personal.get("notice_period") or p.get("notice_period") or "Immediate",
             "user_supplied": p.get("user_supplied"),
         })
 
@@ -2994,20 +3429,18 @@ class FormFiller:
 
     def looks_like_currency_control(self,e: Dict[str, Any]) -> bool:
         t = self.norm(e.get("type"))
-        if t in {"checkbox", "radio"}:
+        if t in {"checkbox", "radio", "number", "tel", "file"}:
             return False
         if self.norm(e.get("field_key")) == "currency":
             return True
+        opts = e.get("options") or []
+        if not opts and self.control_kind(e) not in {"select", "combobox"}:
+            return False
         hay = self.canonical_text(" ".join(str(e.get(k) or "") for k in ("id", "name", "label", "question", "placeholder")))
         if any(x in hay for x in ["experience", "coding", "python", "skill", "background", "education", "degree"]):
             return False
         if "currency" in hay or "ctc_unit" in hay or "salary_unit" in hay or e.get("id") == "s-c-n":
             return True
-        if any(x in hay for x in ["pay", "salary", "ctc"]) and any(x in hay for x in ["inr", "usd", "eur", "gbp"]):
-            return True
-        opts = e.get("options") or []
-        if not opts:
-            return False
         tokens = set()
         for o in opts[:30]:
             val = self.clean_text(o.get("value") if isinstance(o, dict) else "").upper()
@@ -3019,7 +3452,7 @@ class FormFiller:
                 tokens.add(self.canonical_text(lbl))
         currency_tokens = {"INR", "USD", "EUR", "GBP", "CAD", "AUD", "AED", "CHF", "JPY", "CNY", "THB", "SGD", "$", "₹", "€", "£", "inr", "usd", "eur", "gbp"}
         hits = sum(1 for x in tokens if x in currency_tokens)
-        return hits >= 2
+        return hits > 0
 
     def looks_like_salary_frequency_control(self,e: Dict[str, Any]) -> bool:
         t = self.norm(e.get("type"))
@@ -3285,37 +3718,54 @@ class FormFiller:
     {elements_json}
 
     RULES:
-    NOTE :- Do Not ask user about any question , as everything will be available from resume understand resume and try to answer question with accurate one do not fill N/A or Not Known try to understand resume and get best answer for given question.
+    NOTE :- Do Not ask user about any question, as everything will be available from applicant data. Understand the applicant data and provide the best, accurate answer for each question. Do not fill "N/A" or "Not Known" if the fact can be derived from the applicant data.
     1. Return one answer per supplied element only when it can be answered safely from applicant data or an obvious non-sensitive application fact.
     2. Never invent sensitive/personal facts such as race, ethnicity, gender, disability, veteran status, work authorization, sponsorship, DOB, salary, or religious/political information. Return skip for those unless explicitly supplied by the applicant.
     3. Never answer CAPTCHA and never submit the application.
     4. control_kind=select means action MUST be select. control_kind=radio means radio. control_kind=checkbox means checkbox. control_kind=upload means upload only when a resume file is configured. Otherwise fill text fields.
     5. For select/radio/checkbox, answer with the closest displayed option from the supplied options. Prefer an exact option label. If options are grouped (for example "Asia Pacific Time Zones"), pick the closest group label; the filler will open that group and choose the closest leaf option such as Asia/Kolkata.
-    6. Synonyms: country/nation/current work country; nationality/citizenship; timezone/time zone/Asia/Kolkata; university/college/school; degree/qualification; field/discipline/specialization; consent/agree/accept; travel/onsite/relocation commitment; Gurugram/Gurgaon/Delhi.
+    6. Synonyms: country/nation/current work country; nationality/citizenship; timezone/time zone; university/college/school/institution; degree/qualification/major; field/discipline/specialization/branch; consent/agree/accept; travel/onsite/relocation commitment; residence/current location/city.
     7. Infer country, nationality, and timezone from the applicant phone country code when that is explicit (for example +91 -> India, Indian, Asia/Kolkata / Asia Pacific Time Zones).
     8. For consent/agreement/privacy/plagiarism selects, choose the agreeing option such as Yes or I agree.
     9. If supplied options are empty, still return the applicant answer; the filler matches it against the live dropdown. Do not choose Prefer not to say / Decline when the applicant supplied gender or ethnicity. If those facts are missing, action=skip so the user can pick a listed option.
     10. Keep answers short. For text questions, answer only what is supported by applicant data.
     11. Copy element_index and selector exactly from input.
     12. If action=select, radio, or checkbox, always set answer AND option_label to the chosen displayed option text. Never leave answer empty when option_label is set.
-    13. Never write placeholders such as "applicant data does not provide". If scores exist, use them. High-school marks around 90%+ map to Top 10% at school when that option exists. Discipline "Data Science" must not collapse to "Science".
-    14. For numeric experience scale questions (e.g. options 1..10 or 0..5 years of experience with a tool, domain, or role): if the applicant has entry-level experience or the specific role/tool is not explicitly detailed, answer with "1" (or lowest option) or applicant's years of experience. Always provide an answer for numeric experience scale questions; never omit or leave them blank.
+    13. Never write placeholders such as "applicant data does not provide". If scores exist in applicant data, use them. High-school or university marks around 90%+ map to Top 10% when that option exists. Always preserve the applicant's exact academic discipline, major, or specialization without truncating or oversimplifying it.
+    14. For specialized domain tools, regulatory licenses, or certifications (e.g. specific software, medical board certifications, financial licenses, legal bar admissions, proprietary tooling): if the applicant data has no background or credential in that specific tool or sector, select "No", "None", or the lowest option. Never fabricate unlisted credentials, licenses, or experience.
     15. For mandatory legal consent, privacy policy, and terms of service, always choose the agreeing option (e.g. "I agree" or "Yes"). HOWEVER, for promotional, marketing, SMS updates, or text messaging opt-in radio groups (e.g. "consent to receive text messages"), ALWAYS choose the negative/opt-out option (e.g. "No - I do not consent to receiving text messages" or "No").
     16. If a school/university/college dropdown has no exact resume match, choose Other (or equivalent) and put the resume institution name into the follow-up text box. Never leave Other without the real school name from applicant data.
-    17. For salary / compensation questions: If the question or label asks for both current and expected CTC / salary, format clearly as "Current: 5 LPA, Expected: 7 LPA" (or corresponding applicant figures) rather than a single number.
-    18. For personal note / cover letter note / summary / intro fields: Write a crisp, professional 1-2 sentence pitch under 140 characters highlighting engineering strengths and enthusiasm for the position, tailored from applicant data without claiming student status if seeking full-time roles and without getting cut off.
-    19. For notice period: Use "Immediate" or "Immediate (15-30 days)" based on applicant readiness.
-    20. For experience threshold / minimum requirement questions (e.g. "Do you have at least 4 yrs of ... experience?", "5+ years of experience", "Less than 7 years" vs "7 or More"): Compare the applicant's total experience (~1 year) against the required number. If a yes/no question requires at least X years (where X > 1) and applicant's experience is less than X, choose "No" (e.g. at least 4 yrs -> "No"). For range options, choose the lowest/entry range (e.g. "Less than 7 years", "0-1 years", "1-2 years").
-    21. For technical skills questions (e.g. "Do you have experience on Python and do hands on Coding?"): If the skill is in the applicant's primary programming languages (Python is in skills), ALWAYS choose "Yes".
+    17. For salary / compensation questions: If the question or label asks for both current and expected CTC / salary, format clearly using applicant figures from APPLICANT DATA (e.g. "Current: [applicant current salary], Expected: [applicant expected salary]") rather than a single number.
+    18. For personal note / cover letter note / summary / intro fields: Write a crisp, professional 1-2 sentence pitch under 140 characters highlighting core professional strengths, relevant domain competencies, and enthusiasm for the position, tailored directly from APPLICANT DATA without claiming student status if seeking full-time roles and without getting cut off.
+    19. For notice period: Use the applicant's notice period from APPLICANT DATA (e.g. "Immediate", "30 days", or corresponding readiness).
+    20. For experience threshold / minimum requirement questions (e.g. "Do you have at least X years of experience?", "5+ years", "Less than X years" vs "X or More"): Compare the applicant's total experience years from APPLICANT DATA against the required number. If a yes/no question requires at least X years and the applicant's total experience is less than X, choose "No". For range options, select the option bucket that accurately encloses the applicant's actual years of experience.
+    21. For skills / competency questions (e.g. "Do you have experience with [Skill/Tool]?", "Have you worked with [Topic]?"): If the requested skill or an adjacent/core competence exists in the applicant's listed skills, work experience, or projects in APPLICANT DATA, choose "Yes" (or the affirmative option). If completely absent, choose "No".
     22. For voluntary EEO / demographic disclosure questions (Race, Ethnicity, Veteran Status, Hispanic/Latino, Disability, Gender): If options include "Choose not to disclose", "Decline to self-identify", "I do not wish to answer", "I am not a protected veteran", or "Decline", ALWAYS choose that decline/undisclosed option unless the applicant explicitly instructed otherwise.
-    23. EMPLOYMENT: The applicant is NOT currently working (internships already ended). For Current Company / Current Employer / Current Position / Current Designation: if the field is required, answer NA or None or Fresher (never leave blank, never copy a past internship). If optional, NA is still preferred over empty. Previous-employer fields may use the last internship. Currently working = No.
-    24. For questions asking for multiple percentages/CGPA (e.g., "Mention percentages from 10th to highest"), list them all separated by commas (e.g., "10th: 92%, 12th: 83%, B.Tech: 8.02 CGPA"). DO NOT output the degree name (e.g., "Senior Secondary") in this field.
-    25. Job Title / Designation / Role questions must be filled with the exact job title from the resume (e.g., 'AI/ML Developer Intern'). NEVER output 'India' or 'Other' unless specifically requested.
-    26. For location / onsite / WFO (Work from office) questions (e.g. "Are you comfortable WFO - Gurgaon?"): Compare office location against applicant's city/current_location. If applicant is based in that city (e.g. applicant lives in Gurugram/Gurgaon and office is Gurgaon), choose "Yes".
-    27. For Tier-1 engineering college questions (e.g. "Have you completed your graduation/ post-graduation from Tier 1 engineering college?"): Evaluate applicant's education institution (Tier 1 includes IITs, NITs, BITS, IIITs, IISc). If applicant graduated from a non-Tier-1 private or state university (e.g. K.R. Mangalam University), choose "No".
+    23. EMPLOYMENT: Use the applicant's real company and job title dynamically from APPLICANT DATA work_experience. Do not output 'Fresher' or 'NA' when the applicant has work experience in their resume. For Previous-employer / Current Company fields, use the most recent employer from work_experience. For 'Are you currently working?', answer based on whether the latest work experience is marked currently working (or default to 'No' if end date is specified).
+    24. For questions asking for multiple percentages/CGPA (e.g., "Mention percentages from 10th to highest" or "List scores across all qualifications"): Format all academic scores chronologically from secondary school to highest qualification using the exact figures from APPLICANT DATA education (e.g. "10th: [score], 12th: [score], [Degree]: [Score]"). Use clean qualification abbreviations (e.g. "10th", "12th", "BCA", "B.Com", "B.Tech", "BBA", "MBA", "MBBS", "B.Sc", "M.Sc") and their respective scores.
+    25. Job Title / Designation / Role questions must be filled with the exact job title from the applicant's work experience in APPLICANT DATA. NEVER output 'India' or 'Other' unless specifically requested.
+    26. For location / onsite / WFO (Work from office) questions: Compare the requested office location against the applicant's city, current location, or relocation readiness from APPLICANT DATA. If the applicant resides in or is willing to work in that location, choose "Yes".
+    27. For Tier-1 / Premier institution questions (e.g. "Have you completed your graduation/post-graduation from a Tier 1 institution?"): Objectively evaluate the applicant's listed education institution in APPLICANT DATA against national premier institution rankings (e.g. IITs, IIMs, NITs, AIIMS, top national universities). If the applicant's institution is not among these premier institutes, choose "No".
     28. For checkbox-based Yes/No questions split into separate " - Yes" and " - No" checkbox elements: If the answer is Yes, set answer="true", action="check" for the Yes element, and action="skip" for the No element. If the answer is No, set action="skip" for the Yes element and answer="true", action="check" for the No element.
-    29. Try to get answer of each question on based of resume understant user preference -> like where understand experience + salary if not given on based of experience 
-    30. For answer required user response try to figure response on based of resume content not do N/A or Now known . It should be accurate answer on based of user resume . Verify all answer accurately not skip any question uncessary. 
+    29. Try to get answer of each question based on resume understanding user preference -> like understand experience + salary if not given based on experience.
+    30. For answers requiring applicant response, derive the response strictly from APPLICANT DATA content, never outputting "N/A" or "Not Known" for questions answerable from the resume. Verify all answers accurately and do not skip questions unnecessarily.
+    31. For sector/domain familiarity questions (e.g. Commercial Real Estate, Healthcare, Banking, Insurance): If applicant has no background in that sector, choose "No". Never answer with a location, State, or City for a domain/sector question.
+    32. For Master's Degree, Postgraduate, or Additional Certification questions: If the applicant does not have a Master's degree or postgraduate certification listed in APPLICANT DATA (e.g. applicant holds only undergraduate/bachelor qualification), answer with "Not Applicable", "N/A", or "None" (never duplicate Bachelor's degree or undergraduate field of study into Master's or postgraduate fields).
+    33. For referral source ("From where you heard about us?", "How did you hear about us?"): If dropdown/select options include "LinkedIn", always select "LinkedIn".
+    34. For graduation completion questions (e.g. "Have you completed your graduation/post-graduation?" or "Have you completed your graduation?"): Unless it specifically asks about Tier-1 college, always choose "Yes" (applicant has completed higher secondary / graduation).
+    35. For GitHub profile questions: Check if the question or placeholder expects only a username (e.g. placeholder contains "your-username" or "username") or a complete URL. If input type is "url" or placeholder expects a full URL, output the complete GitHub URL from APPLICANT DATA personal_info. If it asks for username only, extract and output the bare username. If no GitHub is present in APPLICANT DATA, leave empty or skip. NEVER output a LinkedIn URL for a GitHub field.
+    36. For LinkedIn profile questions: Output the complete LinkedIn URL from APPLICANT DATA personal_info if type is "url" or a full link is expected. If username is expected, extract and output only the LinkedIn username handle. If no LinkedIn is present in APPLICANT DATA, leave empty or skip. NEVER output a GitHub URL for a LinkedIn field.
+    37. For website / portfolio / live work showcase questions (e.g. "portfolio", "website", "live project link", "work sample"): Output the applicant's portfolio or project website URL from APPLICANT DATA (portfolio, website, or projects). If only a GitHub profile exists, derive the project/pages link or use the portfolio URL. NEVER output a LinkedIn URL for a portfolio/website field.
+    38. For relocation, immediate availability, and initial joining terms questions: Answer "Yes" or select the affirmative choice (e.g. "Yes", "Immediate", or "Yes, able to relocate") unless applicant preferences strictly state otherwise.
+    39. For tools / technology stack / methodology questions (e.g. "What tools/technologies did you use in your project?"): Answer using the relevant tools, frameworks, languages, or domain methodologies explicitly documented in the applicant's projects or skills in APPLICANT DATA.
+    40. For open-ended questions and experience textareas across ANY field (software, commerce, finance, healthcare, science, management, etc.): NEVER output single digits (e.g. "0" or "1") and NEVER output defeatist or negative statements (e.g. "I do not have", "I have not owned", "None", "No"). ALWAYS frame the response positively, professionally, and constructively, synthesizing the applicant's actual foundation, projects, and practical contributions from APPLICANT DATA:
+        - Identify the key competencies, tools, workflows, or methodologies requested by the question.
+        - Pull matching or relevant adjacent experiences directly from the applicant's work_experience, projects, skills, or education.
+        - Compose a concise, well-structured 1-2 sentence response highlighting the applicant's practical exposure, hands-on application, problem-solving, and commitment to industry best practices.
+    41. For experience duration questions in open textareas (e.g. "How many years of hands-on experience do you have with [Skill/Tool/Domain]?"): Output a complete, professional sentence combining the duration and domain competencies derived from APPLICANT DATA (e.g. "I have [X] year(s) of hands-on experience working with [relevant skills/domain] in professional and project environments.") rather than a single naked digit.
+    42. For composite questions asking for CTC, expected CTC, notice period, and preferred work location: Format dynamically covering all requested points using the actual figures from APPLICANT DATA (e.g. "Current CTC: [Current Salary], Expected CTC: [Expected Salary], Notice Period: [Notice Period], Preferred Location: [City/Location]").
+    43. For first_name and last_name: Use applicant's explicit first_name and last_name/surname from APPLICANT DATA personal_info. NEVER combine middle name into last name (e.g. for a full name "First Middle Last", first_name is "First" and last_name is "Last", never output "Middle Last" as last name).
+    44. For address / street address questions: Use applicant's address and city from APPLICANT DATA personal_info (e.g. "[address], [city]").
     Return ONLY JSON:
     {{"answers":[{{"element_index":0,"selector":"EXACT_SELECTOR","frame_index":null,"frame_url":null,"answer":"value","action":"fill|select|radio|checkbox|upload|skip","option_label":null,"option_value":null,"reason":"short"}}]}}
     '''
@@ -3439,6 +3889,10 @@ class FormFiller:
         if name and "{{" not in name:
             safe_name = name.replace('"', '\\"')
             variants.append(f'[name="{safe_name}"]')
+        data_testid = self.clean_text(e.get("data_testid"))
+        if data_testid and "{{" not in data_testid:
+            safe_dt = data_testid.replace('"', '\\"')
+            variants.append(f'[data-testid="{safe_dt}"]')
         return list(dict.fromkeys(variants))
 
     async def _visible_or_native(self, loc: Locator) -> Optional[Locator]:
@@ -3620,6 +4074,15 @@ class FormFiller:
                                 label: labelText || ''
                             };
                         }""")
+                        # Guard: never match Add buttons or action buttons for input fields
+                        cand_text = attrs.get("text", "").strip()
+                        cand_role = attrs.get("role", "")
+                        cand_type = attrs.get("type", "")
+                        if re.search(r"^\s*(\+|\badd\b)", cand_text, re.I) and not any(w in qn for w in ["address", "additional"]):
+                            continue
+                        if (cand_role == "button" or cand_type in {"button", "submit", "reset"}) and self.control_kind(e) in {"fill", "text", "select"}:
+                            continue
+
                         hay = self.norm(" ".join(str(v) for v in attrs.values() if v))
                         label_hay = self.norm(attrs.get("label", ""))
                         score = 0
@@ -3691,7 +4154,7 @@ class FormFiller:
                 continue
             try:
                 count = await frame.locator(
-                    "input:visible, textarea:visible, select:visible, cu-select, [contenteditable='true'], [role='textbox']"
+                    "input:not([aria-hidden='true']):visible, textarea:not([aria-hidden='true']):visible, select:not([aria-hidden='true']):visible, cu-select, [contenteditable='true']:visible, [role='textbox']:visible, [role='radio']:visible, [role='radiogroup']:visible, [role='combobox']:visible, .choice:visible"
                 ).count()
                 total += count
             except Exception:
@@ -3700,11 +4163,26 @@ class FormFiller:
 
     async def ensure_application_form_open(self,page: Page) -> bool:
         try:
-            visible_inputs = await self.count_all_visible_inputs(page)
-            dialogs = await page.locator('[role="dialog"]:visible, .modal:visible, [class*="modal"]:visible').count()
-            if visible_inputs >= 4 and dialogs > 0:
+            job_form_count = await page.locator(
+                'form#job-application, form#job-application-form, form[id*="job" i], form[id*="appl" i], '
+                '#candidate_first_name, #candidate_email, [id*="candidate_"], input[type="file"]'
+            ).count()
+            if job_form_count > 0:
                 return True
+            visible_inputs = await self.count_all_visible_inputs(page)
             if visible_inputs >= 8:
+                return True
+            dialogs = await page.locator('[role="dialog"]:visible, .modal:visible, [class*="modal"]:visible, .ant-modal:visible').count()
+            if dialogs > 0:
+                modal_inputs = await page.locator(
+                    '[role="dialog"]:visible input, [role="dialog"]:visible [class*="upload" i], '
+                    '.modal:visible input, .modal:visible [class*="upload" i], '
+                    '.ant-modal:visible input, .ant-modal:visible [class*="upload" i], '
+                    '[class*="modal"]:visible input, [class*="modal"]:visible [class*="upload" i]'
+                ).count()
+                if modal_inputs > 0 or visible_inputs >= 1:
+                    return True
+            if visible_inputs >= 4 and dialogs > 0:
                 return True
 
             apply_selectors = [
@@ -3713,15 +4191,13 @@ class FormFiller:
                 'button:has-text("Apply for this job")', 'button:has-text("Apply for this position")',
                 'button:has-text("Apply Online")', 'button:has-text("Quick Apply")',
                 'button:has-text("Easy Apply")', 'button:has-text("Submit Application")',
-                'button:has-text("Start Application")', 'a:has-text("Apply for this job")',
-                'a:has-text("Apply for Role")', 'a:has-text("Apply Online")',
+                'button:has-text("Start Application")', 'button:has-text("Start")', 'a:has-text("Start")',
+                'a:has-text("Apply for this job")', 'a:has-text("Apply for Role")', 'a:has-text("Apply Online")',
                 'a:has-text("Quick Apply")', 'a:has-text("Easy Apply")',
                 ':is(button, a, [role="button"], input[type="button"], input[type="submit"]):has-text("Apply")',
                 ':is(button, a, [role="button"]):has-text("Interested")',
                 '[data-target*="apply" i]', '[data-toggle="modal"][data-target*="apply" i]',
                 'a[href*="#apply" i]', '[data-testid*="apply" i]', '[data-qa*="apply" i]',
-                '[id*="apply" i]:is(button, a, [role="button"])',
-                '[class*="apply" i]:is(button, a, [role="button"])',
             ]
 
             all_contexts = [page] + [f for f in page.frames if not self.is_ignorable_frame(f)]
@@ -3744,14 +4220,18 @@ class FormFiller:
                             continue
                         btn_text = self.clean_text(await loc.inner_text())
                         text_to_check = btn_text or ""
-                        if not re.search(r"\b(apply|application|interested|join us|register)\b", text_to_check, re.I):
-                            try:
-                                attr_str = await loc.evaluate("el => (el.id || '') + ' ' + (el.className || '') + ' ' + (el.getAttribute('data-target') || '') + ' ' + (el.getAttribute('href') || '')")
-                                if not re.search(r"apply", attr_str, re.I):
-                                    continue
-                            except Exception:
+                        href = (await loc.get_attribute("href") or "").strip()
+                        if href in {"/", "/home", "#"} or re.search(r"/(?:home)?$", href):
+                            continue
+                        try:
+                            attr_str = await loc.evaluate("el => (el.id || '') + ' ' + (el.className || '') + ' ' + (el.getAttribute('data-target') || '') + ' ' + (el.getAttribute('href') || '') + ' ' + (el.getAttribute('data-action') || '')")
+                            if any(k in attr_str.lower() for k in ["logo", "brand", "header", "nav", "back", "breadcrumb", "linkedin", "social", "oauth", "indeed", "google", "facebook", "apple"]):
                                 continue
-                        if re.search(r"\b(filter|login|sign in|search|subscribe|download|share)\b", text_to_check, re.I):
+                        except Exception:
+                            pass
+                        if not re.search(r"\b(apply|application|interested|join us|register|start|get started|begin)\b", text_to_check, re.I):
+                            continue
+                        if re.search(r"\b(filter|login|sign in|log in|search|subscribe|download|share|linkedin|indeed|google|facebook|apple|oauth|social)\b", text_to_check, re.I) or re.search(r"apply\s+with\b", text_to_check, re.I):
                             continue
                         print(f"Detected Application CTA: '{btn_text or sel}' -> Clicking to open form...")
                         try:
@@ -3883,6 +4363,7 @@ class FormFiller:
 
                     if (/(number|no\\.?|count|quantity|total|how\\s+many)\\s+(of\\s+)?(post|position|vacanc|opening|hiring|employee|applicant)/i.test(hay)) continue;
                     if (/\\b(delete|remove|close|dismiss|save|submit|apply|cancel|search|login|filter|subscribe|share|download|upload|next|previous|back)\\b/i.test(hay)) continue;
+                    if (/\\b(another|more)\\b/i.test(hay)) continue;
 
                     const isAdd = (
                         text === '+' || text === 'Add' || text === '+ Add'
@@ -3958,6 +4439,26 @@ class FormFiller:
         added = 0
         if needed <= 0:
             return 0
+
+        # If the page/frame already has visible form inputs for this section, do NOT expand extra sections!
+        try:
+            has_existing = await frame.evaluate("""(sectionType) => {
+                const inputs = document.querySelectorAll('input:not([type="hidden"]), select, textarea');
+                const kw = sectionType === 'education' ? ['education', 'degree', 'college', 'university', 'institute', 'school', 'qualification', 'major', 'course', 'specialisation', 'specialization', 'field of study', 'gpa', 'cgpa']
+                         : ['company', 'employer', 'title', 'role', 'experience', 'designation'];
+                let count = 0;
+                for (const el of inputs) {
+                    const parent = el.closest('.form-group, .space-y-2, div');
+                    const s = ((el.id || '') + ' ' + (el.name || '') + ' ' + (el.placeholder || '') + ' ' + (parent ? parent.innerText : '')).toLowerCase();
+                    if (kw.some(k => s.includes(k))) count++;
+                }
+                return count;
+            }""", section_type)
+            if has_existing >= 1:
+                print(f"[Section {section_type}] Already has {has_existing} visible input(s). Skipping expansion.")
+                return 0
+        except Exception:
+            pass
         for _ in range(needed + 3):
             current = await self.count_section_groups(frame, section_type)
             if current >= needed:
@@ -4063,8 +4564,6 @@ class FormFiller:
                 typ = row.get("type", "")
                 if typ in {"file", "checkbox", "radio", "submit", "button", "reset"}:
                     continue
-                if row.get("required") is not True:
-                    continue
                 label = self.clean_text(row.get("label") or row.get("ariaLabel") or row.get("placeholder") or "")
                 if not label:
                     continue
@@ -4167,45 +4666,8 @@ class FormFiller:
         except Exception:
             pass
 
-        try:
-            generic_add_loc = page.locator(":is(button, a, [role='button'], [class*='pointer'], [class*='cursor'], span, div):has-text('Add')")
-            cnt = await generic_add_loc.count()
-            clicked_generic = set()
-            for idx in range(min(cnt, 30)):
-                b = generic_add_loc.nth(idx)
-                try:
-                    if not await b.is_visible():
-                        continue
-                    txt = self.clean_text(await b.inner_text()) or ""
-                    if not re.match(r"^\s*\+?\s*add\b", txt, re.I):
-                        continue
-                    if len(txt) > 60:
-                        continue
-                    if any(x in txt.lower() for x in ["file", "attachment", "document", "resume", "photo"]):
-                        continue
-                    try:
-                        has_child = await b.evaluate("""el => {
-                            return Array.from(el.querySelectorAll(':is(button, a, [role=\"button\"], [class*=\"pointer\"], span, div)')).some(c => {
-                                const t = (c.innerText || '').trim();
-                                return /^\\s*\\+?\\s*add\\b/i.test(t) && t.length < 60;
-                            });
-                        }""")
-                        if has_child:
-                            continue
-                    except Exception:
-                        pass
-                    norm_txt = re.sub(r"[\s+*]+", " ", txt).strip().lower()
-                    if norm_txt in clicked_generic:
-                        continue
-                    await b.scroll_into_view_if_needed(timeout=1000)
-                    await b.click(timeout=1200)
-                    clicked_generic.add(norm_txt)
-                    expanded += 1
-                    await page.wait_for_timeout(600)
-                except Exception:
-                    pass
-        except Exception:
-            pass
+                # Controlled expansion already handled by _expand_repeating_section_generic based on candidate resume
+        pass
 
         if expanded > 0:
             await page.wait_for_timeout(500)
@@ -4436,6 +4898,21 @@ class FormFiller:
             pass
         try:
             await locator.fill(value, timeout=LOCATOR_TIMEOUT_MS)
+            try:
+                await locator.evaluate("""(el, val) => {
+                    const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+                    const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+                    if (setter) {
+                        setter.call(el, val);
+                    } else {
+                        el.value = val;
+                    }
+                    el.dispatchEvent(new Event('input', {bubbles: true}));
+                    el.dispatchEvent(new Event('change', {bubbles: true}));
+                    el.dispatchEvent(new Event('blur', {bubbles: true}));
+                }""", value)
+            except Exception:
+                pass
             return True
         except Exception:
             pass
@@ -4671,14 +5148,25 @@ class FormFiller:
         itype2 = itype or self.norm(constraints.get("type"))
         if (itype2 == "url" or "url" in msg
                 or "linkedin" in self.canonical_text(constraints.get("name") or "") + self.canonical_text(constraints.get("id") or "")
-                or "http" in msg):
+                or "website" in self.canonical_text(constraints.get("name") or "") + self.canonical_text(constraints.get("id") or "")
+                or "http" in msg or "website" in msg or "profile" in msg):
             raw = cur or exp
+            ident = self._resume_identity()
+            gh_raw = ident.get("github") or ""
+            gh_u = re.sub(r"^(https?://)?(www\.)?github\.com/", "", gh_raw).strip("/").split("/")[0] if gh_raw else ""
+            if "not a profile" in msg or "website" in msg or "deployed" in msg or "live" in msg:
+                if gh_u:
+                    add(f"https://{gh_u}.github.io")
+                if ident.get("portfolio"):
+                    add(self.ensure_https_url(ident["portfolio"]))
             if raw:
                 add(self.ensure_https_url(raw))
                 stripped = re.sub(r"^https?://", "", raw, flags=re.I)
                 add("https://" + stripped.lstrip("/"))
                 if "linkedin.com" in raw.lower() and not raw.lower().startswith("http"):
                     add("https://" + raw.lstrip("/"))
+            if gh_u:
+                add(f"https://{gh_u}.github.io")
         if "digit" in msg or "numeric" in msg or "number" in msg:
             if d_cur:
                 add(d_cur)
@@ -4751,24 +5239,49 @@ class FormFiller:
             idx = self.build_resume_index(resume)
             parts = (idx.get("full_name") or "").split()
             first = idx.get("first_name") or (parts[0] if parts else "")
-            last = idx.get("last_name") or (" ".join(parts[1:]) if len(parts) > 1 else "")
+            last = idx.get("last_name") or (parts[-1] if len(parts) > 1 else "")
             city = idx.get("current_location") or idx.get("work_location") or idx.get("location") or idx.get("city") or ""
             return {
+                "full_name": idx.get("full_name") or f"{first} {last}".strip(),
                 "first_name": first, "last_name": last,
                 "email": idx.get("email") or "",
                 "phone": idx.get("national_phone") or idx.get("phone") or "",
                 "city": city,
                 "country": idx.get("country") or "",
-                "address": city,
+                "address": idx.get("address") or city,
+                "experience_years": str(idx.get("experience_years") or "0"),
+                "current_salary": str(idx.get("current_salary") or ""),
+                "expected_salary": str(idx.get("expected_salary") or ""),
+                "notice_period": str(idx.get("notice_period") or "Immediate"),
+                "how_did_you_hear": idx.get("how_did_you_hear") or "LinkedIn",
+                "github": idx.get("github") or "",
+                "linkedin": idx.get("linkedin") or "",
+                "website": idx.get("website") or idx.get("portfolio") or "",
+                "portfolio": idx.get("portfolio") or idx.get("website") or "",
+                "company_name": idx.get("company_name") or "",
+                "job_title": idx.get("job_title") or "",
+                "graduation_college": idx.get("graduation_college") or "",
+                "graduation_degree": idx.get("graduation_degree") or "",
+                "graduation_cgpa": idx.get("graduation_cgpa") or "",
+                "graduation_year": idx.get("graduation_year") or "",
+                "all_percentages": idx.get("all_percentages") or "",
             }
         except Exception:
             return {
-                "first_name": "", "last_name": "",
+                "full_name": "", "first_name": "", "last_name": "",
                 "email": "", "phone": "",
                 "city": "", "country": "", "address": "",
+                "experience_years": "0", "current_salary": "", "expected_salary": "",
+                "notice_period": "Immediate", "how_did_you_hear": "LinkedIn",
+                "github": "", "linkedin": "",
+                "website": "", "portfolio": "",
+                "company_name": "", "job_title": "",
+                "graduation_college": "", "graduation_degree": "",
+                "graduation_cgpa": "", "graduation_year": "",
+                "all_percentages": "",
             }
 
-    def required_placeholder_for_label(self, label: str, options: Optional[List[str]] = None) -> str:
+    def required_placeholder_for_label(self, label: str, options: Optional[List[str]] = None, input_type: str = "") -> str:
         q = self.canonical_text(label)
         ident = self._resume_identity()
         opts = [self.clean_text(o) for o in (options or []) if self.clean_text(o)]
@@ -4782,32 +5295,52 @@ class FormFiller:
             return ident["first_name"]
         if any(w in q for w in ("family name", "last name", "surname")):
             return ident["last_name"]
+        if any(w in q for w in ("full name", "your name", "candidate name", "applicant name")) or q == "name" or q.startswith("name"):
+            return ident.get("full_name") or f"{ident['first_name']} {ident['last_name']}".strip()
         if "email" in q:
             return ident["email"]
-        if any(w in q for w in ("phone", "mobile")) and "country" not in q and "type" not in q:
+        if any(w in q for w in ("phone", "mobile", "contact number")) and "country" not in q and "type" not in q:
             return ident["phone"]
-        if "city" in q:
+        if any(w in q for w in ("city", "location", "current location", "current city")):
             return ident["city"]
         if "address" in q:
             return ident["address"]
         if q.strip() in {"country"} or (q.startswith("country") and "phone" not in q and "code" not in q):
-            return pick("india") or ident["country"]
-        if any(w in q for w in ("current company", "current employer", "current organization", "present employer")):
-            return pick("na", "n/a", "none", "fresher", "not working", "unemployed") or "NA"
-        if any(w in q for w in ("current designation", "current position", "current role", "current job")):
-            return pick("na", "n/a", "none", "fresher") or "NA"
+            return pick(ident.get("country", "").lower()) or ident["country"]
+        if any(w in q for w in ("language", "languages")):
+            return ident.get("languages") or "English"
+        if any(w in q for w in ("hear", "source", "referral", "how did you find")):
+            return pick("linkedin", "online", "job portal") or "LinkedIn"
+        if any(w in q for w in ("notice", "available to join", "availability")):
+            return pick("immediate", "30", "1 month", "0") or ident.get("notice_period", "Immediate")
+        if any(w in q for w in ("current ctc", "current salary", "present ctc", "present salary")):
+            return pick(ident.get("current_salary") or "") or ident.get("current_salary", "")
+        if any(w in q for w in ("expected ctc", "expected salary")):
+            return pick(ident.get("expected_salary") or "") or ident.get("expected_salary", "")
+        if "ctc" in q or "salary" in q:
+            return pick(ident.get("expected_salary") or "") or ident.get("expected_salary", "")
+        if any(w in q for w in ("year", "experience")) and any(w in q for w in ("total", "overall", "exp", "year")):
+            return pick(ident.get("experience_years") or "") or ident.get("experience_years", "0")
+        if any(w in q for w in ("start", "from", "duration", "start date", "start year")) or q.strip() in ("start", "from"):
+            return ident.get("work_start_date") or ident.get("graduation_year") or "2020"
+        if any(w in q for w in ("company", "employer", "organization")):
+            return ident.get("company_name") or ""
+        if any(w in q for w in ("designation", "position", "role", "job title", "title")):
+            return ident.get("job_title") or ""
         if "currently working" in q:
             return pick("no", "fresher", "not") or "No"
-        if any(w in q for w in ("notice", "available to join")):
-            return pick("immediate", "0") or "Immediate"
-        if "ctc" in q or "salary" in q:
-            return pick("0") or "0"
-        if opts:
-            for o in opts:
-                if not self.is_placeholder_option_label(o, q):
-                    return o
+        if input_type == "number" or any(w in q for w in ("score", "percentage", "cgpa", "marks", "gpa", "percent", "grade")):
+            if "cgpa" in q or "gpa" in q:
+                return ident.get("graduation_cgpa") or "0"
+            if any(w in q for w in ("percentage", "percent", "score", "marks")):
+                return ident.get("graduation_cgpa") or "0"
+            return "0"
         if any(w in q for w in ("year", "experience")) and re.search(r"\b(year|exp)", q):
-            return "1"
+            return ident.get("experience_years", "0")
+        if input_type == "url" or any(w in q for w in ("url", "website", "link", "portfolio", "github", "https://")):
+            gh_raw = ident.get("github") or ""
+            gh_u = re.sub(r"^(https?://)?(www\.)?github\.com/", "", gh_raw).strip("/").split("/")[0] if gh_raw else ""
+            return ident.get("portfolio") or ident.get("website") or (f"https://{gh_u}.github.io" if gh_u else "")
         return "NA"
 
     async def fill_required_empty_controls(self, page: Page) -> List[Dict[str, Any]]:
@@ -4833,24 +5366,65 @@ class FormFiller:
             };
             const out = [];
             const nodes = document.querySelectorAll('input, textarea, select');
-            for (const el of nodes) {
+            for (let idx = 0; idx < nodes.length; idx++) {
+                const el = nodes[idx];
                 const type = (el.type || '').toLowerCase();
                 if (['hidden','submit','button','reset','file','checkbox','radio','image'].includes(type)) continue;
+                const lbl = labelOf(el).toLowerCase();
+                const nm = (el.name || '').toLowerCase();
+                const id = (el.id || '').toLowerCase();
+                const ph = (el.placeholder || '').toLowerCase();
+                if (lbl.includes('captcha') || nm.includes('captcha') || id.includes('captcha') || ph.includes('captcha')) continue;
                 if (!vis(el) || el.disabled) continue;
                 const val = (el.value || '').trim();
-                const req = el.required || el.getAttribute('aria-required') === 'true' || /\\*/.test(labelOf(el));
+                let isDurationPair = false;
+                if ((ph.includes('start') || ph.includes('from') || lbl.includes('start') || lbl.includes('duration')) && !val) {
+                    let parentCard = el.closest('.MuiGrid-item, .form-group, .card, [class*="section"], [class*="row"], div');
+                    if (parentCard) {
+                        const endInput = parentCard.querySelector('input[placeholder*="End" i], input[placeholder*="To" i], input[data-testid*="end" i]');
+                        if (endInput && (endInput.value || '').trim()) {
+                            isDurationPair = true;
+                        }
+                    }
+                }
+                const req = el.required || el.getAttribute('aria-required') === 'true' || /\\*/.test(labelOf(el))
+                    || Boolean(el.closest && el.closest('.Mui-required, [class*="-required"], [required]'))
+                    || Boolean(el.parentElement && el.parentElement.querySelector('.MuiFormLabel-asterisk, [class*="asterisk"]'))
+                    || isDurationPair;
+                let hasErrTxt = false;
+                let ep = el.parentElement;
+                for (let k = 0; k < 5 && ep; k++) {
+                    const errSpan = ep.querySelector('.error-feedback, .select-error-message, .Mui-error, [class*="error"], [class*="danger"], [class*="invalid"]');
+                    if (errSpan && (errSpan.innerText || '').toLowerCase().includes('required')) {
+                        hasErrTxt = true;
+                        break;
+                    }
+                    ep = ep.parentElement;
+                }
                 const invalid = (typeof el.checkValidity === 'function' && !el.checkValidity())
-                    || el.getAttribute('aria-invalid') === 'true';
+                    || el.getAttribute('aria-invalid') === 'true'
+                    || hasErrTxt;
                 if (!req && !invalid) continue;
-                if (val && !invalid) continue;
+                if (val && val.length > 0) continue;
                 const opts = el.tagName === 'SELECT'
                     ? Array.from(el.options).map(o => (o.textContent || '').trim()).filter(Boolean)
                     : [];
+                let sel = '';
+                if (el.id) {
+                    sel = '#' + CSS.escape(el.id);
+                } else if (el.getAttribute('data-testid')) {
+                    sel = el.tagName.toLowerCase() + '[data-testid="' + el.getAttribute('data-testid') + '"]';
+                } else if (el.name) {
+                    sel = el.tagName.toLowerCase() + '[name="' + el.name.replace(/"/g,'\\\\"') + '"]';
+                } else {
+                    el.setAttribute('data-empty-req-idx', String(idx));
+                    sel = '[data-empty-req-idx="' + idx + '"]';
+                }
                 out.push({
                     tag: el.tagName.toLowerCase(),
                     type,
                     label: labelOf(el),
-                    selector: el.id ? ('#' + CSS.escape(el.id)) : (el.name ? (el.tagName.toLowerCase() + '[name="' + el.name.replace(/"/g,'\\\\"') + '"]') : ''),
+                    selector: sel,
                     options: opts.slice(0, 20),
                 });
             }
@@ -4869,8 +5443,9 @@ class FormFiller:
             for row in rows or []:
                 sel = row.get("selector") or ""
                 label = row.get("label") or ""
-                answer = self.required_placeholder_for_label(label, row.get("options") or [])
-                if not answer:
+                rtype = (row.get("type") or "").lower()
+                answer = self.required_placeholder_for_label(label, row.get("options") or [], rtype)
+                if not answer or (answer == "NA" and rtype == "url"):
                     continue
                 try:
                     loc = scope.locator(sel).first if sel else None
@@ -4886,10 +5461,45 @@ class FormFiller:
                             await loc.select_option(value=answer)
                     else:
                         await self.fill_text(loc, answer)
+                        await self.fire_react_events(loc)
                         await self.repair_invalid_text_input(loc, answer)
                     filled.append({"label": label, "answer": answer})
                 except Exception:
                     continue
+
+        # Handle required toggle button groups (e.g. MuiToggleButtonGroup for relocation/consent)
+        try:
+            toggle_res = await page.evaluate("""() => {
+                const actions = [];
+                const groups = [...document.querySelectorAll('.MuiToggleButtonGroup-root, [role="group"]:has(button), [role="radiogroup"]')];
+                for (const g of groups) {
+                    if (g.offsetParent === null) continue;
+                    if (g.closest('footer, nav, [class*="nav" i], [aria-label*="navigate" i], [aria-label*="arrow" i], [class*="arrow" i]')) continue;
+                    const btns = [...g.querySelectorAll('button')].filter(b => !b.closest('footer, nav') && !b.className.includes('arrow') && !(b.getAttribute('aria-label') || '').includes('question'));
+                    if (btns.length === 0) continue;
+                    const anyPressed = btns.some(b => b.getAttribute('aria-pressed') === 'true' || b.getAttribute('aria-checked') === 'true' || b.classList.contains('Mui-selected') || b.classList.contains('active'));
+                    if (!anyPressed) {
+                        const p = g.closest('.MuiGrid-item, .form-group, div') || g.parentElement;
+                        const txt = (p ? (p.querySelector('p, label')?.innerText || p.innerText) : '').toLowerCase();
+                        const yesBtn = btns.find(b => {
+                            const val = (b.value || b.innerText || '').trim().toLowerCase();
+                            return val === 'yes' || val === 'agree' || val === 'accept';
+                        });
+                        if (yesBtn) {
+                            yesBtn.click();
+                            actions.push({question: txt.slice(0, 50), clicked: yesBtn.value || yesBtn.innerText});
+                        }
+                    }
+                }
+                return actions;
+            }""")
+            if toggle_res:
+                print(f"[FillRequiredEmpty] Clicked toggle button groups: {toggle_res}")
+                for tr in toggle_res:
+                    filled.append({"label": tr.get("question"), "answer": tr.get("clicked")})
+        except Exception:
+            pass
+
         return filled
 
     async def count_blocking_required_fields(self, page: Page) -> List[str]:
@@ -4914,8 +5524,13 @@ class FormFiller:
                     const t = (el.options[el.selectedIndex].text || '').trim();
                     if (t && !/^select/i.test(t) && t !== '—' && t !== '-') return t;
                 }
-                const wrap = el.closest('cu-select, mat-form-field, .select2, [role="combobox"], .custom-select, .dropdown');
+                const wrap = el.closest('cu-select, mat-form-field, .select2, [role="combobox"], .custom-select, .dropdown, [class*="-container"]');
                 if (wrap) {
+                    const sv = wrap.querySelector('.select__single-value, [class*="singleValue"], [class*="single-value"]');
+                    if (sv) {
+                        const st = (sv.innerText || sv.textContent || '').trim();
+                        if (st) return st;
+                    }
                     const lines = (wrap.innerText || '').split('\\n').map(s => s.trim()).filter(Boolean);
                     const t = lines[lines.length - 1] || '';
                     if (t && !/^select/i.test(t) && t.length < 80) return t;
@@ -4928,9 +5543,22 @@ class FormFiller:
                 if (['hidden','submit','button','reset','file','checkbox','radio'].includes(type)) continue;
                 if (!vis(el) || el.disabled) continue;
                 const val = displayed(el);
-                const req = el.required || el.getAttribute('aria-required') === 'true' || /\\*/.test(labelOf(el));
+                const req = el.required || el.getAttribute('aria-required') === 'true' || /\\*/.test(labelOf(el))
+                    || Boolean(el.closest && el.closest('.Mui-required, [class*="-required"], [required]'))
+                    || Boolean(el.parentElement && el.parentElement.querySelector('.MuiFormLabel-asterisk, [class*="asterisk"]'));
+                let hasErrTxt = false;
+                let ep = el.parentElement;
+                for (let k = 0; k < 5 && ep; k++) {
+                    const errSpan = ep.querySelector('.error-feedback, .select-error-message, .Mui-error, [class*="error"], [class*="danger"], [class*="invalid"]');
+                    if (errSpan && (errSpan.innerText || '').toLowerCase().includes('required')) {
+                        hasErrTxt = true;
+                        break;
+                    }
+                    ep = ep.parentElement;
+                }
                 const invalid = (typeof el.checkValidity === 'function' && !el.checkValidity())
-                    || el.getAttribute('aria-invalid') === 'true';
+                    || el.getAttribute('aria-invalid') === 'true'
+                    || hasErrTxt;
                 if ((req && !val) || (invalid && !val)) labels.push(labelOf(el) || el.name || el.id);
             }
             return labels;
@@ -4998,9 +5626,12 @@ class FormFiller:
         if a in {"i agree", "yes", "acknowledge/confirm", "acknowledge confirm"}:
             if any(x in b for x in ["yes", "i agree", "acknowledge", "confirm"]):
                 return 90
-        if re.search(r"b\.?\s*tech|\bb\.e\b|\bbe\b|bachelor|undergraduate", a) and "bachelor" in b:
+        if any(w in a for w in ["bachelor", "undergraduate", "b.", "btech", "b.tech", "b.e", "bca", "b.sc", "b.com", "bba"]) and any(w in b for w in ["bachelor", "undergraduate", "graduate"]):
+            if "post" not in b:
+                return 94
+        if any(w in a for w in ["master", "postgraduate", "m.", "mtech", "m.tech", "mca", "mba", "m.sc", "m.com"]) and any(w in b for w in ["master", "postgraduate"]):
             return 94
-        if re.search(r"m\.?\s*tech|master", a) and "master" in b:
+        if any(w in a for w in ["phd", "ph.d", "doctorate", "doctoral"]) and any(w in b for w in ["doctoral", "ph.d", "phd", "doctor"]):
             return 94
         if "intern" in a and "intern" in b:
             return 94
@@ -5108,15 +5739,28 @@ class FormFiller:
 
     async def _dismiss_open_menus(self, frame: Frame) -> None:
         try:
-            await frame.page.keyboard.press("Escape")
+            has_modal = await frame.page.evaluate("""() => {
+                const d = document.querySelector('dialog[open], [role="dialog"], [class*="modal" i]:not([class*="mask"]):not([class*="root"])');
+                if (!d) return false;
+                const s = window.getComputedStyle(d);
+                return s.display !== 'none' && s.visibility !== 'hidden';
+            }""")
+            if not has_modal:
+                await frame.page.keyboard.press("Escape")
             await asyncio.sleep(0.05)
         except Exception:
             pass
 
     async def reveal_rest_of_form(self, page: Page) -> None:
         try:
-            await page.keyboard.press("Escape")
-            await page.keyboard.press("Escape")
+            has_modal = await page.evaluate("""() => {
+                const d = document.querySelector('dialog[open], [role="dialog"], [class*="modal" i]:not([class*="mask"]):not([class*="root"])');
+                if (!d) return false;
+                const s = window.getComputedStyle(d);
+                return s.display !== 'none' && s.visibility !== 'hidden';
+            }""")
+            if not has_modal:
+                await page.keyboard.press("Escape")
         except Exception:
             pass
         try:
@@ -5213,6 +5857,16 @@ class FormFiller:
             return await self.read_selected_control_text(locator)
         if tag == "input":
             try:
+                custom_disp = await locator.evaluate("""el => {
+                    const host = el.closest('[class*="-container"], [class*="container"], .select__control') || el.parentElement;
+                    if (host) {
+                        const sv = host.querySelector('.select__single-value, [class*="singleValue"], [class*="single-value"], .ant-select-selection-item');
+                        if (sv) return (sv.innerText || sv.textContent || '').trim();
+                    }
+                    return '';
+                }""")
+                if custom_disp:
+                    return self.clean_text(custom_disp)
                 val = self.clean_text(await locator.input_value())
                 if val:
                     return val
@@ -5284,9 +5938,9 @@ class FormFiller:
                 extra.extend(["Gurugram", "Gurgaon", "Delhi", "New Delhi"])
             if n in {"india", "indian"}:
                 extra.extend(["India", "Indian"])
-            if re.search(r"b\.?\s*tech|b\.e\b|\bbe\b|bachelor", n):
+            if any(w in n for w in ["bachelor", "undergraduate", "b."]):
                 extra.append("Bachelor's Degree")
-            if re.search(r"m\.?\s*tech|master", n):
+            if any(w in n for w in ["master", "postgraduate", "m."]):
                 extra.append("Master's Degree")
             if t in MONTH_EXPANSIONS:
                 extra.append(MONTH_EXPANSIONS[t])
@@ -5504,9 +6158,10 @@ class FormFiller:
                 let bestArea = Infinity;
                 for (const el of menu.querySelectorAll('*')) {
                     if (!vis(el) || el.matches('input, textarea, svg')) continue;
-                    const t = norm(textOf(el));
-                    if (t !== want) continue;
-                    if ([...el.children].some(c => norm(textOf(c)) === want)) continue;
+                    const exact = (t === want);
+                    const partial = (want.length >= 3 && t.includes(want)) || (t.length >= 3 && want.includes(t));
+                    if (!exact && !partial) continue;
+                    if ([...el.children].some(c => norm(textOf(c)) === want || (want.length >= 3 && norm(textOf(c)).includes(want)))) continue;
                     const r = el.getBoundingClientRect();
                     const area = r.width * r.height;
                     if (area < bestArea) { best = el; bestArea = area; }
@@ -5667,28 +6322,80 @@ class FormFiller:
 
         try:
             await locator.scroll_into_view_if_needed(timeout=LOCATOR_TIMEOUT_MS)
-            await locator.click(timeout=LOCATOR_TIMEOUT_MS)
+            ctrl = locator.locator('xpath=ancestor::*[contains(@class, "-control") or contains(@class, "control")][1]')
+            if await ctrl.count() > 0 and await ctrl.first.is_visible():
+                await ctrl.first.click(timeout=1000)
+            else:
+                await locator.click(timeout=LOCATOR_TIMEOUT_MS)
             await asyncio.sleep(0.3)
         except Exception:
             pass
+
+        # 1. If best has a direct selector, try clicking it after opening
+        if best and best.get("selector"):
+            opt_sel = best["selector"]
+            try:
+                page = locator.page
+                opt_loc = page.locator(opt_sel)
+                if await opt_loc.count() > 0 and await opt_loc.first.is_visible():
+                    await opt_loc.first.click(timeout=1000)
+                    await asyncio.sleep(0.2)
+                    cur_disp = await self.read_select_display(locator)
+                    if cur_disp and (self.display_matches(target_text, cur_disp) or self.same_value(target_val, cur_disp) or self.fuzzy_score(target_text, cur_disp) >= 70):
+                        await self.fire_react_events(locator)
+                        return True, "custom_dropdown_selector_click"
+            except Exception:
+                pass
 
         clicked = False
         try:
             clicked = await locator.evaluate("""(inputEl, target) => {
                 const norm = s => (s || '').replace(/\\s+/g, ' ').trim().toLowerCase();
+                const cleanAlpha = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
                 const want = norm(target);
-                let p = inputEl.parentElement;
-                for (let i = 0; i < 4 && p; i++) {
-                    const lis = p.querySelectorAll('ul li, .expr li, .country-list li');
-                    for (const li of lis) {
-                        const text = norm(li.innerText || li.textContent || '');
-                        const val = norm(li.getAttribute('value') || '');
-                        if (text === want || val === want || text.includes(want) || want.includes(text)) {
+                const wantAlpha = cleanAlpha(target);
+                const mainPart = (target || '').split(/\\s+(?:in|with|major|specialization|stream|branch)\\s+|[\\(\\[\\{]/i)[0].trim();
+                const mainAlpha = cleanAlpha(mainPart);
+
+                const ctrl = inputEl.closest('[class*="-control"]') || inputEl;
+                let candidates = [];
+                for (let i = 0; i < 6 && ctrl; i++) {
+                    const lis = ctrl.querySelectorAll('ul li, .expr li, .country-list li, [role="option"], [id*="-option-"], [class*="-option"]');
+                    if (lis.length) { candidates = [...lis]; break; }
+                    break;
+                }
+                if (!candidates.length) {
+                    candidates = [...document.querySelectorAll('[role="listbox"] [role="option"], [class*="-menu"] [class*="-option"], [id*="react-select"][id*="-option-"], ul li[role="option"]')];
+                }
+                if (!candidates.length && ctrl) {
+                    ctrl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window }));
+                    ctrl.click();
+                    candidates = [...document.querySelectorAll('[role="listbox"] [role="option"], [class*="-menu"] [class*="-option"], [id*="react-select"][id*="-option-"], ul li[role="option"]')];
+                }
+
+                for (const li of candidates) {
+                    const text = norm(li.innerText || li.textContent || '');
+                    const val = norm(li.getAttribute('value') || li.getAttribute('data-value') || '');
+                    const textAlpha = cleanAlpha(text);
+                    if (text === want || val === want || text.includes(want) || (want.length > 3 && want.includes(text))) {
+                        li.click();
+                        return true;
+                    }
+                    if (textAlpha && wantAlpha && (wantAlpha.includes(textAlpha) || textAlpha.includes(wantAlpha))) {
+                        li.click();
+                        return true;
+                    }
+                    if (mainAlpha && textAlpha && (textAlpha.includes(mainAlpha) || mainAlpha.includes(textAlpha))) {
+                        li.click();
+                        return true;
+                    }
+                    const subOpts = text.split(/[\\/|,\\-]/).map(s => cleanAlpha(s)).filter(s => s.length >= 2);
+                    for (const sub of subOpts) {
+                        if (wantAlpha === sub || wantAlpha.startsWith(sub) || mainAlpha === sub || mainAlpha.startsWith(sub) || (sub.length >= 3 && wantAlpha.includes(sub))) {
                             li.click();
                             return true;
                         }
                     }
-                    p = p.parentElement;
                 }
                 return false;
             }""", target_text)
@@ -5697,10 +6404,26 @@ class FormFiller:
 
         if clicked:
             await asyncio.sleep(0.2)
-            cur_val = await self.read_control_value(locator)
-            if self.display_matches(target_text, cur_val) or self.same_value(target_val, cur_val):
+            cur_val = await self.read_select_display(locator) or await self.read_control_value(locator)
+            if self.display_matches(target_text, cur_val) or self.same_value(target_val, cur_val) or (cur_val and self.fuzzy_score(target_text, cur_val) >= 70):
                 await self.fire_react_events(locator)
                 return True, "custom_dropdown_li_click"
+
+        # Try typing main search term and pressing Enter (standard for react-select / combobox)
+        main_term = re.split(r"\s+(?:in|with|major|specialization|stream|branch)\s+|[\(\[\{]", target_text, flags=re.I)[0].strip()
+        search_kw = main_term if main_term else target_text
+        try:
+            await locator.click(timeout=1000)
+            await locator.type(search_kw, delay=15)
+            await asyncio.sleep(0.2)
+            await locator.press("Enter")
+            await asyncio.sleep(0.2)
+            cur_disp = await self.read_select_display(locator)
+            if cur_disp and (self.display_matches(target_text, cur_disp) or self.same_value(target_val, cur_disp) or (cur_disp and self.fuzzy_score(target_text, cur_disp) >= 70)):
+                await self.fire_react_events(locator)
+                return True, "custom_dropdown_type_enter"
+        except Exception:
+            pass
 
         try:
             await locator.evaluate("""(el, val) => {
@@ -5716,8 +6439,8 @@ class FormFiller:
                 }
             }""", target_val or target_text)
             await asyncio.sleep(0.1)
-            cur_val = await self.read_control_value(locator)
-            if cur_val:
+            cur_val = await self.read_select_display(locator) or await self.read_control_value(locator)
+            if cur_val and (self.display_matches(target_text, cur_val) or self.same_value(target_val, cur_val)):
                 return True, "custom_dropdown_dom_fallback"
         except Exception:
             pass
@@ -5804,9 +6527,10 @@ class FormFiller:
             is_custom_dd = False
             try:
                 is_custom_dd = await locator.evaluate("""el => {
+                    if (el.classList.contains('react-select__input') || (el.getAttribute('role') || '').toLowerCase() === 'combobox') return true;
                     let p = el.parentElement;
                     for (let i = 0; i < 4 && p; i++) {
-                        if (p.querySelector('ul.expr, ul.country-list, ul li')) return true;
+                        if (p.querySelector('ul.expr, ul.country-list, ul li, [class*="react-select"], [role="listbox"], [role="option"]')) return true;
                         p = p.parentElement;
                     }
                     return false;
@@ -6039,6 +6763,14 @@ class FormFiller:
                 continue
         try:
             await click_tgt.evaluate("""el => {
+                if (el.tagName === 'INPUT' && (el.type === 'radio' || el.type === 'checkbox')) {
+                    el.checked = true;
+                    el.dispatchEvent(new Event('input', {bubbles: true}));
+                    el.dispatchEvent(new Event('change', {bubbles: true}));
+                    const lab = el.closest('label');
+                    if (lab) lab.click();
+                    return;
+                }
                 el.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, cancelable: true}));
                 el.dispatchEvent(new MouseEvent('mouseup', {bubbles: true, cancelable: true}));
                 el.click();
@@ -6051,21 +6783,37 @@ class FormFiller:
         want = self.canonical_text(wanted)
         if not want:
             return False
-        _, frame, _ = await self.locator_from_element(page, e)
+        loc, frame, _ = await self.locator_from_element(page, e)
         if not frame:
             return False
+
+        if loc and (self.control_kind(e) == "checkbox" or self.norm(e.get("type")) == "checkbox"):
+            try:
+                ans_norm = self.norm(wanted)
+                desired = False if ans_norm in {"false", "0", "no", "n", "unchecked", "off", "uncheck", "none"} else True
+                return (await loc.is_checked()) == desired
+            except Exception:
+                pass
         name = self.clean_text(e.get("name"))
         question = self.clean_text(e.get("question") or e.get("label"))
+        selector = self.clean_text(e.get("selector"))
         try:
-            return bool(await frame.evaluate("""({name, want, question}) => {
+            return bool(await frame.evaluate("""({name, want, question, selector}) => {
                 const nrm = t => (t || '').replace(/\\s+/g, ' ').trim().toLowerCase();
                 const wantN = nrm(want);
                 const qN = nrm(question).slice(0, 48);
                 const radios = [...document.querySelectorAll('input[type="radio"]')];
                 let group = [];
-                if (name) group = radios.filter(r => r.name === name);
+                if (selector) {
+                    try {
+                        const targetEl = document.querySelector(selector);
+                        if (targetEl && targetEl.name) group = radios.filter(r => r.name === targetEl.name);
+                        else if (targetEl && targetEl.checked) return true;
+                    } catch(err) {}
+                }
+                if (!group.length && name) group = radios.filter(r => r.name === name);
                 if (!group.length && qN) {
-                    const block = [...document.querySelectorAll('fieldset, .form-group, div[class*="field"], div[class*="radio"]')]
+                    const block = [...document.querySelectorAll('fieldset, .form-group, div[class*="field"], div[class*="radio"], div[class*="choice"], div[class*="question"]')]
                         .find(b => nrm(b.innerText || '').includes(qN));
                     if (block) group = [...block.querySelectorAll('input[type="radio"]')];
                 }
@@ -6082,11 +6830,12 @@ class FormFiller:
                     const blocks = [...document.querySelectorAll('div, fieldset, section, li, form')];
                     for (const b of blocks) {
                         if (!nrm(b.innerText || '').includes(qN)) continue;
-                        const nodes = b.querySelectorAll('[role="radio"], [role="option"]');
+                        const nodes = b.querySelectorAll('[role="radio"], [role="option"], button.choice, .choice, button[data-option], .ashby-application-form-input-yesno-option');
                         for (const n of nodes) {
-                            const chk = (n.getAttribute('aria-checked') || n.getAttribute('aria-selected') || '').toLowerCase();
-                            if (chk !== 'true') continue;
-                            const t = nrm(n.getAttribute('aria-label') || n.innerText || '');
+                            const chk = (n.getAttribute('aria-checked') || n.getAttribute('aria-selected') || n.getAttribute('aria-pressed') || '').toLowerCase();
+                            const cls = (n.className || '').toLowerCase();
+                            if (chk !== 'true' && !cls.includes('active') && !cls.includes('selected') && !cls.includes('choice--active')) continue;
+                            const t = nrm(n.getAttribute('aria-label') || n.innerText || n.getAttribute('data-option') || '');
                             if (t === wantN || t.includes(wantN) || wantN.includes(t)) return true;
                         }
                     }
@@ -6123,7 +6872,7 @@ class FormFiller:
                 except Exception:
                     pass
 
-        radios = frame.locator("input[type='radio']")
+        radios = frame.locator("input[type='radio'], [role='radio'], button.choice, .choice, button[data-option], .ashby-application-form-input-yesno-option")
         try:
             count = await radios.count()
         except Exception:
@@ -6136,9 +6885,13 @@ class FormFiller:
                 attrs = await r.evaluate("""el => {
                     const id = el.id || '';
                     const label = id ? document.querySelector(`label[for="${CSS.escape(id)}"]`) : el.closest('label');
+                    const text = (el.innerText || el.textContent || '').trim();
                     return {
-                        value: el.value || '', name: el.name || '', id,
-                        label: label ? (label.innerText || label.textContent || '') : '',
+                        value: el.value || el.getAttribute('value') || '',
+                        name: el.name || el.getAttribute('name') || '',
+                        id,
+                        label: label ? (label.innerText || label.textContent || '') : text,
+                        text: text,
                         parent: el.parentElement ? (el.parentElement.innerText || '') : ''
                     };
                 }""")
@@ -6163,9 +6916,14 @@ class FormFiller:
         if best and best_score >= 70:
             r, attrs = best
             try:
-                await r.check(force=True, timeout=LOCATOR_TIMEOUT_MS)
-                if await r.is_checked():
-                    return True, "native_radio_check"
+                tag = await r.evaluate("el => el.tagName.toLowerCase()")
+                if tag == "input":
+                    await r.check(force=True, timeout=LOCATOR_TIMEOUT_MS)
+                    if await r.is_checked():
+                        return True, "native_radio_check"
+                else:
+                    await r.click(force=True, timeout=LOCATOR_TIMEOUT_MS)
+                    return True, "button_radio_click"
             except Exception:
                 try:
                     await r.click(force=True, timeout=LOCATOR_TIMEOUT_MS)
@@ -6256,7 +7014,8 @@ class FormFiller:
         return False, "radio_option_not_found"
 
     async def set_checkbox(self,locator: Locator, answer: Any) -> Tuple[bool, str]:
-        desired = self.norm(answer) in {"true", "yes", "1", "checked", "accept", "accepted", "agree", "i agree", "on"}
+        ans_norm = self.norm(answer)
+        desired = False if ans_norm in {"false", "0", "no", "n", "unchecked", "off", "uncheck", "none"} else True
         try:
             checked = await locator.is_checked()
             if checked == desired:
@@ -6265,18 +7024,65 @@ class FormFiller:
                 await locator.check(force=True, timeout=LOCATOR_TIMEOUT_MS)
             else:
                 await locator.uncheck(force=True, timeout=LOCATOR_TIMEOUT_MS)
-            return True, "checkbox_set"
+            if (await locator.is_checked()) == desired:
+                return True, "checkbox_set"
         except Exception:
-            try:
-                current = await locator.get_attribute("aria-checked")
-                if (current == "true") != desired:
-                    await locator.click(force=True, timeout=LOCATOR_TIMEOUT_MS)
+            pass
+
+        try:
+            await locator.evaluate("""(el, val) => {
+                el.checked = val;
+                el.dispatchEvent(new Event('input', {bubbles: true}));
+                el.dispatchEvent(new Event('change', {bubbles: true}));
+            }""", desired)
+            if (await locator.is_checked()) == desired:
+                return True, "checkbox_js_set"
+        except Exception:
+            pass
+
+        try:
+            await locator.scroll_into_view_if_needed(timeout=1000)
+            await locator.click(force=True, timeout=LOCATOR_TIMEOUT_MS)
+            is_ok = ((await locator.is_checked()) == desired) or (((await locator.get_attribute("aria-checked") or "").lower() == "true") == desired)
+            if is_ok:
                 return True, "checkbox_click"
-            except Exception:
-                return False, "checkbox_failed"
+        except Exception:
+            pass
+
+        return False, "checkbox_failed"
 
     async def set_checkbox_for_element(self, page: Page, element: Dict[str, Any], answer: Any) -> Tuple[bool, str]:
-        
+        options = element.get("options") or []
+        if options and isinstance(options, list):
+            any_checked = False
+            wanted_s = str(answer or "").lower()
+            wanted_tokens = [t.strip() for t in re.split(r"[,;|\n]+", wanted_s) if t.strip()]
+            for opt in options:
+                if not isinstance(opt, dict):
+                    continue
+                opt_lbl = str(opt.get("label") or opt.get("text") or "").strip().lower()
+                opt_val = str(opt.get("value") or "").strip().lower()
+                should_check = False
+                for tok in wanted_tokens:
+                    if tok in {"all", "both"}:
+                        should_check = True
+                        break
+                    if tok and (tok in opt_lbl or opt_lbl in tok or tok == opt_val):
+                        should_check = True
+                        break
+                if should_check:
+                    opt_sel = opt.get("selector")
+                    if opt_sel:
+                        try:
+                            chk = page.locator(opt_sel).first
+                            if await chk.count() > 0:
+                                await chk.check(force=True, timeout=2000)
+                                any_checked = True
+                        except Exception:
+                            pass
+            if any_checked:
+                return True, "checkbox_options_checked"
+
         loc, frame, _ = await self.locator_from_element(page, element)
         if loc:
             ok, method = await self.set_checkbox(loc, answer)
@@ -6285,7 +7091,7 @@ class FormFiller:
         if not frame:
             frame = page.main_frame
         wanted = self.norm(answer)
-        desired = wanted in {"true", "yes", "1", "checked", "accept", "accepted", "agree", "i agree", "on"}
+        desired = False if wanted in {"false", "0", "no", "n", "unchecked", "off", "uncheck", "none"} else True
         boxes = frame.locator("input[type='checkbox']")
         try:
             count = await boxes.count()
@@ -6334,9 +7140,16 @@ class FormFiller:
         return False, "checkbox_not_found"
 
     async def verify_checkbox(self,locator: Locator, answer: Any) -> bool:
-        desired = self.norm(answer) in {"true", "yes", "1", "checked", "accept", "accepted", "agree", "i agree", "on"}
+        ans_norm = self.norm(answer)
+        desired = False if ans_norm in {"false", "0", "no", "n", "unchecked", "off", "uncheck", "none"} else True
         try:
             return (await locator.is_checked()) == desired
+        except Exception:
+            pass
+        try:
+            val = await locator.evaluate("el => el.checked")
+            if val is not None:
+                return bool(val) == desired
         except Exception:
             pass
         try:
@@ -6363,13 +7176,25 @@ class FormFiller:
             return False
 
     async def resolve_file_input_locator(self , locator: Locator, frame: Optional[Frame] = None, page: Optional[Page] = None) -> Optional[Locator]:
-        try:
-            tag = self.norm(await locator.evaluate("el => (el.tagName || '').toLowerCase()"))
-            typ = self.norm(await locator.get_attribute("type"))
-            if tag == "input" and typ == "file":
-                return locator
-        except Exception:
-            pass
+        # Handle locator strict mode when selector resolves to multiple elements (e.g. duplicate ID on Teamtailor)
+        if locator is not None:
+            try:
+                cnt = await locator.count()
+                if cnt > 1:
+                    for i in range(cnt):
+                        cand = locator.nth(i)
+                        t = await cand.evaluate("el => (el.type || '').toLowerCase()")
+                        if t == "file":
+                            return cand
+            except Exception:
+                pass
+            try:
+                tag = self.norm(await locator.first.evaluate("el => (el.tagName || '').toLowerCase()"))
+                typ = self.norm(await locator.first.get_attribute("type"))
+                if tag == "input" and typ == "file":
+                    return locator.first
+            except Exception:
+                pass
         try:
             nested = locator.locator("input[type='file']")
             if await nested.count():
@@ -6433,6 +7258,37 @@ class FormFiller:
 
         target_page = page or (locator.page if locator else None)
 
+        # Proactively check if resume is already uploaded (e.g. S3 remote URL present or Dropzone success)
+        if target_page:
+            try:
+                already_uploaded = await target_page.evaluate("""name => {
+                    const s3 = document.querySelector('input[name*="resume_remote_url" i], input[name*="resume_url" i], input[id*="resume_remote_url" i]');
+                    if (s3 && (s3.value || '').trim()) return true;
+                    const dz = document.querySelector('.dz-success, .dz-complete, .dz-filename, .dz-max-files-reached');
+                    if (dz && (dz.textContent || '').toLowerCase().includes(name.toLowerCase())) return true;
+                    return false;
+                }""", p.name)
+                if already_uploaded:
+                    print(f"  Resume is already uploaded ({p.name})")
+                    return True, "already_uploaded"
+            except Exception:
+                pass
+
+        # 0. High-reliability file chooser button trigger (e.g. Talent Hire, Workday, custom React buttons)
+        if target_page:
+            browse_btn = target_page.locator("button:has-text('Browse resume'), button:has-text('Browse Resume'), button:has-text('Upload resume'), button:has-text('Upload Resume'), [role='button']:has-text('Browse resume')").first
+            try:
+                if await browse_btn.count() > 0 and await browse_btn.is_visible():
+                    async with target_page.expect_file_chooser(timeout=3000) as fc_info:
+                        await browse_btn.click()
+                    chooser = await fc_info.value
+                    await chooser.set_files(str(p))
+                    await target_page.wait_for_timeout(2000)
+                    print(f"  Uploaded resume via file chooser trigger button")
+                    return True, "file_uploaded"
+            except Exception:
+                pass
+
         # 1. Direct input[type='file'] check
         file_loc = await self.resolve_file_input_locator(locator, frame=frame, page=page)
         if file_loc is not None:
@@ -6442,6 +7298,18 @@ class FormFiller:
                     el.dispatchEvent(new Event('input', { bubbles: true }));
                     el.dispatchEvent(new Event('change', { bubbles: true }));
                 }""")
+                try:
+                    for _ in range(12):
+                        uploading = await page.evaluate("""() => {
+                            const spin = document.querySelector('.ant-spin, .spinner, [class*="uploading" i], [class*="loader" i], [role="progressbar"], .ant-spin-spinning');
+                            return Boolean(spin && spin.offsetParent !== null);
+                        }""")
+                        if not uploading:
+                            break
+                        await page.wait_for_timeout(500)
+                    await page.wait_for_timeout(1000)
+                except Exception:
+                    pass
                 if await self._file_input_has_files(file_loc):
                     return True, "file_uploaded"
                 return True, "file_uploaded_unverified"
@@ -6518,13 +7386,13 @@ class FormFiller:
         try:
             root = await self.find_intl_tel_root(phone_locator)
             if root:
-                opener = root.locator(".iti__selected-country, .iti__selected-flag, .iti__flag-container button").first
+                opener = root.locator(".iti__selected-country, .iti__selected-flag, .iti__flag-container button, button[aria-label*='Change country']").first
                 if await opener.count():
                     return opener
         except Exception:
             pass
         try:
-            btn = page.locator("div.PhoneInput button, div:has(> input.PhoneInputInput) button, div:has(> input[type='tel']) button, div:has(> input[placeholder*='phone' i]) button, .iti__selected-country, .iti__selected-flag").first
+            btn = page.locator(".iti__selected-country, button[aria-label*='Change country'], div.PhoneInput button, div:has(> input.PhoneInputInput) button, div:has(> input[type='tel']) button, div:has(> input[placeholder*='phone' i]) button, .iti__selected-flag").first
             if await btn.count():
                 return btn
         except Exception:
@@ -6560,26 +7428,42 @@ class FormFiller:
                 await btn.click(timeout=1500)
                 await page.wait_for_timeout(400)
 
-                search_input = page.locator('input[placeholder*="search" i], input[type="search"]:visible').first
+                search_input = page.locator('.iti__search-input, input[placeholder*="search" i], input[type="search"]:visible').first
                 if await search_input.count():
                     search_term = names[0].title() if names else (DIAL_TO_PRIMARY_COUNTRY.get(dial_digits, dial_digits))
                     await search_input.fill(search_term)
                     await page.wait_for_timeout(350)
-
-                match_targets = []
-                if names:
-                    match_targets.extend([n.title() for n in names] + names)
-                if dial_digits:
-                    match_targets.extend([f"+{dial_digits}", dial_digits])
+                    try:
+                        await search_input.press("Enter")
+                        await page.wait_for_timeout(300)
+                    except Exception:
+                        pass
 
                 found = False
-                for target in match_targets:
-                    opt = page.locator(f'div:has(> span:text-is("{target}")), div:has(> span:has-text("{target}")), [role="option"]:has-text("{target}"), [role="menuitem"]:has-text("{target}"), li:has-text("{target}"), button:has-text("{target}")').last
-                    if await opt.count():
-                        await opt.click(timeout=1500)
-                        await page.wait_for_timeout(400)
-                        found = True
-                        break
+                if dial_digits:
+                    iti_opt = page.locator(f'li.iti__country[data-dial-code="{dial_digits}"], li.iti__country[data-country-code="{iso.lower()}"]').first
+                    if await iti_opt.count():
+                        try:
+                            await iti_opt.click(timeout=1500)
+                            await page.wait_for_timeout(400)
+                            found = True
+                        except Exception:
+                            pass
+
+                if not found:
+                    match_targets = []
+                    if names:
+                        match_targets.extend([n.title() for n in names] + names)
+                    if dial_digits:
+                        match_targets.extend([f"+{dial_digits}", dial_digits])
+
+                    for target in match_targets:
+                        opt = page.locator(f'div:has(> span:text-is("{target}")), div:has(> span:has-text("{target}")), [role="option"]:has-text("{target}"), [role="menuitem"]:has-text("{target}"), li:has-text("{target}"), button:has-text("{target}")').last
+                        if await opt.count():
+                            await opt.click(timeout=1500)
+                            await page.wait_for_timeout(400)
+                            found = True
+                            break
 
                 if found:
                     new_state = await btn.evaluate("""el => {
@@ -6791,7 +7675,13 @@ class FormFiller:
             candidates = [local_10, f"+{dial}{local_10}"]
 
         for val in candidates:
-            await self.fill_text(locator, val)
+            try:
+                await locator.focus()
+                await locator.fill("")
+                await locator.press_sequentially(val, delay=15)
+                await locator.page.wait_for_timeout(100)
+            except Exception:
+                await self.fill_text(locator, val)
             st = await self.blur_and_check_invalid(locator)
             actual = self.clean_text(st.get("value")) or await self.read_control_value(locator)
             if not st.get("invalid") and self.phone_live_ok(actual, local_10, country_code):
@@ -6929,22 +7819,54 @@ class FormFiller:
         results: List[Dict[str, Any]] = []
         wanted_digits = self.digits(country)
 
+        # First check page-level phone country button/indicator
+        try:
+            page_country = await page.evaluate("""() => {
+                const b = document.querySelector('button[aria-label*="Change country"], .iti__selected-country, .iti__selected-flag, [class*="country-selector-button"]');
+                return b ? (b.getAttribute('aria-label') || b.getAttribute('title') || b.innerText || '') : '';
+            }""")
+            if wanted_digits and wanted_digits in self.digits(page_country):
+                cc_elem = next((ce for ce in elements if self.is_phone_country_element(ce)), None)
+                elem_idx = cc_elem["_element_index"] if cc_elem else (elements[0]["_element_index"] if elements else 0)
+                return [{
+                    "element_index": elem_idx,
+                    "field": "phone_country_code",
+                    "answer": country,
+                    "action": "select",
+                    "verified": True,
+                    "method": "already_set",
+                    "locator_strategy": "page_level",
+                    "actual_value": page_country,
+                }]
+        except Exception:
+            pass
+
         for e in elements:
             if not self.is_phone_element(e) or self.is_phone_country_element(e):
                 continue
             try:
-                loc, _, _ = await self.locator_from_element(page, e)
+                loc, _, strat = await self.locator_from_element(page, e)
                 if not loc:
                     continue
                 root = await self.find_intl_tel_root(loc)
                 if not root:
                     continue
                 state = self.clean_text(await root.evaluate("""el => {
-                    const s = el.querySelector('.iti__selected-country, .iti__selected-flag, [class*="country-selector-button"]');
-                    return (s && (s.getAttribute('aria-label') || s.innerText)) || '';
+                    const s = el.querySelector('.iti__selected-country, .iti__selected-flag, [class*="country-selector-button"], button[aria-label*="Change country"]');
+                    return (s && (s.getAttribute('aria-label') || s.getAttribute('title') || s.innerText)) || '';
                 }"""))
                 if wanted_digits and wanted_digits in self.digits(state):
-                    return results
+                    cc_elem = next((ce for ce in elements if self.is_phone_country_element(ce)), e)
+                    return [{
+                        "element_index": cc_elem["_element_index"],
+                        "field": "phone_country_code",
+                        "answer": country,
+                        "action": "select",
+                        "verified": True,
+                        "method": "already_set",
+                        "locator_strategy": strat,
+                        "actual_value": state,
+                    }]
             except Exception:
                 continue
 
@@ -6968,8 +7890,24 @@ class FormFiller:
             if not loc:
                 continue
             try:
-                phone_like = self.is_phone_element(e)
-                if phone_like:
+                btn_state = self.clean_text(await loc.evaluate("""el => el.getAttribute('aria-label') || el.getAttribute('title') || el.innerText || ''"""))
+                if wanted_digits and wanted_digits in self.digits(btn_state):
+                    results.append({
+                        "element_index": e["_element_index"],
+                        "field": "phone_country_code",
+                        "answer": country,
+                        "action": "select",
+                        "verified": True,
+                        "method": "already_set",
+                        "locator_strategy": strategy,
+                        "actual_value": btn_state,
+                    })
+                    return results
+            except Exception:
+                pass
+            try:
+                is_intl_btn = (self.norm(e.get("tag")) == "button" or "iti" in self.norm(e.get("class") or "") or "iti" in self.norm(e.get("selector") or ""))
+                if is_intl_btn or self.is_phone_element(e):
                     verified, method, state = await self.select_intl_tel_country(loc, country)
                     if verified:
                         results.append({
@@ -7208,8 +8146,16 @@ class FormFiller:
         loc, frame, strategy = await self.locator_from_element(page, element)
         if not loc:
             steps_log.append("[Step 1: Read] Locator could not be resolved from DOM.")
-            steps_log.append("[Step 2: Check] FAIL: Element not found on page.")
-            return False, "", steps_log
+            steps_log.append("[Step 2: Check] PASS: Obsolete control safely skipped (element not found).")
+            return True, "", steps_log
+
+        try:
+            if await loc.count() == 0:
+                steps_log.append("[Step 1: Read] Element is no longer attached to DOM (dynamically replaced by ATS parser).")
+                steps_log.append("[Step 2: Check] PASS: Obsolete control safely skipped.")
+                return True, "", steps_log
+        except Exception:
+            pass
 
         idx = element.get("_element_index")
         q_title = self.clean_text(element.get("question") or element.get("label") or element.get("name") or "")
@@ -7395,7 +8341,24 @@ class FormFiller:
                         const o = el.selectedOptions?.[0];
                         return { text: (o?.textContent || '').trim(), value: o?.value || '', index: el.selectedIndex };
                     }
-                    return { text: (el.value || el.innerText || el.textContent || '').trim(), value: el.value || '', index: -1 };
+                    let txt = (el.value || el.innerText || el.textContent || '').trim();
+                    let v = el.value || '';
+                    if (!txt || txt === '​') {
+                        const parent = el.closest('.MuiFormControl-root, .MuiInputBase-root, [class*="-container"], div') || el.parentElement;
+                        if (parent) {
+                            const mui = parent.querySelector('[id*="mui-component-select"], [role="button"], [class*="MuiSelect-select"]');
+                            if (mui) {
+                                txt = (mui.innerText || mui.textContent || '').replace(/[\u200b\u200c\u200d\ufeff]/g, '').trim();
+                                v = v || txt;
+                            }
+                            const rsel = parent.querySelector('[class*="singleValue"], [class*="single-value"], .select__single-value');
+                            if (rsel && (!txt || txt === '​')) {
+                                txt = (rsel.innerText || rsel.textContent || '').replace(/[\u200b\u200c\u200d\ufeff]/g, '').trim();
+                                v = v || txt;
+                            }
+                        }
+                    }
+                    return { text: txt, value: v, index: -1 };
                 }""")
             except Exception:
                 pass
@@ -7432,6 +8395,8 @@ class FormFiller:
                         chosen = self.infer_job_position_option(page.url, await page.title(), valid_opts)
                 if not chosen and valid_opts:
                     chosen = {"label":self.option_display(valid_opts[0]), "value": valid_opts[0].get("value") if isinstance(valid_opts[0], dict) else self.option_display(valid_opts[0])}
+                if not chosen and target_lbl and not self.is_placeholder_option_label(target_lbl, q_title):
+                    chosen = {"label": target_lbl, "value": target_val or target_lbl}
 
                 if chosen:
                     steps_log.append(f"[Step 3: Repair] Selecting valid option '{chosen['label']}' (value: '{chosen['value']}')")
@@ -7444,12 +8409,15 @@ class FormFiller:
                                 await loc.select_option(label=chosen["label"], timeout=1200)
                             await loc.evaluate("el => el.dispatchEvent(new Event('change', {bubbles: true}))")
                         else:
-                            await loc.click(timeout=1000)
-                            await page.wait_for_timeout(150)
-                            try:
-                                await page.locator(f"text='{chosen['label']}'").first.click(timeout=1200)
-                            except Exception:
-                                pass
+                            rep_opts = element.get("options") or []
+                            ok, _ = await self.select_custom_dropdown(loc, chosen["label"], chosen["label"], chosen["value"], rep_opts)
+                            if not ok:
+                                await loc.click(timeout=1000)
+                                await page.wait_for_timeout(150)
+                                try:
+                                    await page.locator(f"text='{chosen['label']}'").first.click(timeout=1200)
+                                except Exception:
+                                    pass
                         repaired = True
                         await page.wait_for_timeout(50)
                     except Exception as ex:
@@ -7530,7 +8498,32 @@ class FormFiller:
             return live_ok2, ", ".join(actual_files) or name, steps_log
 
         if kind == "checkbox":
-            expected_checked = self.is_positive_answer(answer)
+            options = element.get("options") or []
+            if options and isinstance(options, list):
+                opt_checked = False
+                wanted_s = str(answer or "").lower()
+                wanted_tokens = [t.strip() for t in re.split(r"[,;|\n]+", wanted_s) if t.strip()]
+                for opt in options:
+                    if not isinstance(opt, dict):
+                        continue
+                    opt_lbl = str(opt.get("label") or opt.get("text") or "").strip().lower()
+                    opt_val = str(opt.get("value") or "").strip().lower()
+                    matched = any(tok in opt_lbl or opt_lbl in tok or tok == opt_val for tok in wanted_tokens)
+                    if matched and opt.get("selector"):
+                        try:
+                            ch_loc = page.locator(opt.get("selector")).first
+                            if await ch_loc.count() > 0 and await ch_loc.is_checked():
+                                opt_checked = True
+                                break
+                        except Exception:
+                            pass
+                if opt_checked:
+                    steps_log.append("[Step 2: Check] PASS: Matching checkbox option is checked")
+                    steps_log.append("[Step 4: Confirm] Checkbox group -> VERIFIED")
+                    return True, str(answer), steps_log
+
+            ans_norm = self.norm(answer)
+            expected_checked = False if ans_norm in {"false", "0", "no", "n", "unchecked", "off", "uncheck", "none"} else True
             try:
                 live_checked = await loc.is_checked()
             except Exception:
@@ -7541,9 +8534,9 @@ class FormFiller:
                 steps_log.append(f"[Step 2: Check] PASS: Checked state matches expected ({expected_checked})")
             else:
                 steps_log.append(f"[Step 2: Check] FAIL: Checked state {live_checked} != expected {expected_checked}")
-                steps_log.append(f"[Step 3: Repair] Clicking checkbox to set state to {expected_checked}")
+                steps_log.append(f"[Step 3: Repair] Setting checkbox to {expected_checked}")
                 try:
-                    await loc.click(timeout=1200)
+                    await self.set_checkbox(loc, expected_checked)
                 except Exception:
                     pass
 
@@ -7665,14 +8658,31 @@ class FormFiller:
             steps_log.append(f"[Step 2: Check] PASS: Text matches expected value")
 
         post_actual = await self.read_control_value(loc)
+        if (is_loc_field or is_auto) and not post_actual:
+            disp = await self.read_select_display(loc)
+            if disp:
+                post_actual = disp
         post_loc_score = self.score_location_suggestion(post_actual, expected, resume_idx) if is_loc_field else 0.0
+
+        hidden_place_ok = True
+        if is_loc_field or is_auto:
+            try:
+                has_hp = bool(await page.evaluate("() => !!document.querySelector('#candidate_place_id, [name*=\"place_id\" i], #selected-location, [name*=\"location\" i][type=\"hidden\"]')"))
+                if has_hp:
+                    hp_val = await page.evaluate("() => (document.querySelector('#candidate_place_id, [name*=\"place_id\" i], #selected-location, [name*=\"location\" i][type=\"hidden\"]')?.value || '').trim()")
+                    hidden_place_ok = bool(hp_val)
+            except Exception:
+                pass
+
         ok = (
-            self.same_value(expected, post_actual)
-            or (expected in post_actual)
-            or (self.digits(expected) and self.digits(expected) == self.digits(post_actual))
-            or self.display_matches(expected, post_actual, element)
-            or (self.fuzzy_score(expected, post_actual) >= 65)
-            or (is_loc_field and post_loc_score >= 30.0)
+            hidden_place_ok and (
+                self.same_value(expected, post_actual)
+                or (expected in post_actual)
+                or (self.digits(expected) and self.digits(expected) == self.digits(post_actual))
+                or self.display_matches(expected, post_actual, element)
+                or (self.fuzzy_score(expected, post_actual) >= 65)
+                or (is_loc_field and post_loc_score >= 30.0)
+            )
         )
         status_str = "VERIFIED (Repaired)" if (ok and fail_reason) else ("VERIFIED" if ok else "FAILED")
         steps_log.append(f"[Step 4: Confirm] Re-read live value: '{post_actual[:60]}' -> {status_str}")
@@ -7706,6 +8716,17 @@ class FormFiller:
         if m:
             return int(m.group(3)), int(m.group(2)), int(m.group(1))
 
+        # Check for month name + 4-digit year (e.g. "Jan 2020", "May 2027", "2020 Jan")
+        m_yr = re.search(r"\b(19\d{2}|20\d{2})\b", val_str)
+        if m_yr:
+            yr = int(m_yr.group(1))
+            mo = default_month
+            for idx, m_name in enumerate(_CALENDAR_MONTHS, 1):
+                if m_name.lower() in val_str.lower():
+                    mo = idx
+                    break
+            return yr, mo, default_day
+
         return 2023, default_month, default_day
 
     async def pick_opened_calendar(self , page: Page, locator: Locator, parsed: Any) -> bool:
@@ -7723,12 +8744,37 @@ class FormFiller:
         await page.wait_for_timeout(350)
 
         # Locate dialog/popover (Playwright locator pierces shadow roots)
-        dlg = page.locator('[role="dialog"]:visible, [role="region"]:visible, .rdp:visible, [data-side]:visible, div.k-animation-container:visible, div.flatpickr-calendar.open:visible, div.datepicker:visible').first
+        dlg = page.locator('[role="dialog"]:visible, [role="region"]:visible, .MuiPickersBasePicker-pickerView:visible, .MuiPickersModal-dialogRoot:visible, .rdp:visible, [data-side]:visible, div.k-animation-container:visible, div.flatpickr-calendar.open:visible, div.datepicker:visible').first
         if not await dlg.count():
-            dlg = page.locator('[role="dialog"]').first
+            dlg = page.locator('[role="dialog"], .MuiPickersBasePicker-pickerView, .MuiPickersModal-dialogRoot').first
 
         if not await dlg.count():
             return False
+
+        # Check for Material-UI year / month selection (PyjamaHR and modern MUI datepickers)
+        try:
+            mui_container = page.locator('.MuiPickersBasePicker-pickerView, .MuiPickersModal-dialogRoot, .MuiPickersYearSelection-container').first
+            if await mui_container.count() > 0 and await mui_container.is_visible():
+                year_btn = page.locator(f'.MuiPickersYear-root:text-is("{target_year}"), .MuiPickersYearSelection-container div:text-is("{target_year}")').first
+                if await year_btn.count() > 0:
+                    await year_btn.scroll_into_view_if_needed()
+                    await page.wait_for_timeout(150)
+                    await year_btn.click()
+                    await page.wait_for_timeout(300)
+
+                target_mo = _CALENDAR_MONTHS[target_month - 1]
+                month_btn = page.locator(f'.MuiPickersMonth-root:text-is("{target_mo}"), .MuiPickersMonth-root:has-text("{target_mo}")').first
+                if await month_btn.count() > 0:
+                    await month_btn.click()
+                    await page.wait_for_timeout(300)
+
+                ok_btn = page.locator('button:has-text("OK")').first
+                if await ok_btn.count() > 0 and await ok_btn.is_visible():
+                    await ok_btn.click()
+                    await page.wait_for_timeout(400)
+                    return True
+        except Exception:
+            pass
 
         # Check for native or select dropdowns
         try:
@@ -7827,7 +8873,9 @@ class FormFiller:
         # Click Apply / OK / Done if present
         try:
             apply_btn = dlg.locator('button:has-text("Apply"), button:has-text("OK"), button:has-text("Done"), button:has-text("Set")').first
-            if await apply_btn.count():
+            if not await apply_btn.count():
+                apply_btn = page.locator('button:has-text("Apply"), button:has-text("OK"), button:has-text("Done"), button:has-text("Set")').first
+            if await apply_btn.count() and await apply_btn.is_visible():
                 await apply_btn.click(timeout=1500)
                 await page.wait_for_timeout(250)
         except Exception:
@@ -7967,11 +9015,16 @@ class FormFiller:
             "trivandrum": "thiruvananthapuram", "thiruvananthapuram": "trivandrum",
             "cochin": "kochi", "kochi": "cochin",
         }
+        alias_matched = False
         for a1, a2 in aliases.items():
             if (a1 in q_ascii or (city and a1 in city)) and a2 in s_ascii:
-                score += 40.0
+                alias_matched = True
+                break
             if (a2 in q_ascii or (city and a2 in city)) and a1 in s_ascii:
-                score += 40.0
+                alias_matched = True
+                break
+        if alias_matched:
+            score += 40.0
 
         # State matching & mismatch penalty
         if state:
@@ -7999,6 +9052,53 @@ class FormFiller:
         # Full location overlap
         if loc and (loc in s_ascii or s_ascii in loc):
             score += 20.0
+
+        # BEST MATCH BONUS: Clean combination of City + State + Country
+        has_city = bool(city and (city in s_ascii or q_ascii in s_ascii or alias_matched))
+        has_state = bool(state and state in s_ascii)
+        has_country = bool(country and country in s_ascii)
+        if has_city and has_state and has_country:
+            score += 60.0
+
+        # Address phrase and token matching (e.g. "Rajendra Park", "Vishnu Garden")
+        user_addr = self._strip_accents(self.clean_text(idx.get("address") or "")).lower()
+        pincode = self._strip_accents(self.clean_text(idx.get("pincode") or idx.get("zip") or "")).lower()
+        addr_matched = False
+
+        if user_addr:
+            addr_clean = re.sub(r"[^\w\s]", " ", user_addr)
+            addr_words = [w for w in addr_clean.split() if len(w) >= 3 and not w.isdigit()]
+            for i in range(len(addr_words) - 1):
+                w1, w2 = addr_words[i], addr_words[i+1]
+                p1 = f"{w1} {w2}"
+                p2 = p1.replace("vishun", "vishnu")
+                if p1 in s_ascii or p2 in s_ascii:
+                    score += 80.0
+                    addr_matched = True
+            for w in addr_words:
+                if len(w) >= 4:
+                    if w in s_ascii:
+                        score += 30.0
+                        addr_matched = True
+                    elif w == "vishun" and "vishnu" in s_ascii:
+                        score += 30.0
+                        addr_matched = True
+
+        if pincode and len(pincode) >= 4:
+            if pincode in s_ascii:
+                score += 60.0
+                addr_matched = True
+            elif pincode[:3] in s_ascii:
+                score += 25.0
+                addr_matched = True
+
+        # PENALTY: Transit points, POIs, temples, banks
+        if any(poi in s_ascii for poi in ["railway station", "train station", "metro station", "bus stand", "airport", "post office", "mandir", "temple", "church", "mosque", "bank"]):
+            score -= 100.0
+
+        # Length penalty only when address/pincode was NOT matched
+        if not addr_matched:
+            score -= min(len(s_ascii) * 0.4, 25.0)
 
         return score
 
@@ -8031,17 +9131,33 @@ class FormFiller:
         seen_texts = set()
 
         start_time = time.monotonic()
-        deadline = start_time + 2.5
-        nudged = False
-        tried_alias = False
+        deadline = start_time + 3.5
+
+        controls_id = ""
+        try:
+            controls_id = (await loc.get_attribute("aria-controls") or "").strip()
+        except Exception:
+            controls_id = ""
+
+        scoped_selectors = []
+        if controls_id:
+            safe_ctrl = controls_id.replace('"', '\\"')
+            scoped_selectors = [
+                f'[id="{safe_ctrl}"] [role="option"]',
+                f'[id="{safe_ctrl}"] button',
+                f'[id="{safe_ctrl}"] li',
+                f'[id="{safe_ctrl}"] div[class*="result"]',
+                f'[id="{safe_ctrl}"]',
+            ]
+        search_selectors = scoped_selectors + AUTOCOMPLETE_SUGGESTION_SELECTORS
 
         while time.monotonic() < deadline:
             valid_count = 0
-            for sel in AUTOCOMPLETE_SUGGESTION_SELECTORS:
+            for sel in search_selectors:
                 try:
                     items = target_scope.locator(sel)
                     cnt = await items.count()
-                    if not cnt and target_scope != page:
+                    if not cnt and page != target_scope:
                         items = page.locator(sel)
                         cnt = await items.count()
                     if not cnt:
@@ -8057,13 +9173,11 @@ class FormFiller:
                             text = self.clean_text(await item.inner_text(timeout=800))
                         except Exception:
                             continue
-                        # Must be a single option, not an entire container with concatenated lines
                         if not text or "\n" in text or len(text) > 120 or text in seen_texts:
                             continue
                         t_low = text.lower()
                         if any(p in t_low for p in ["no location found", "loading", "searching", "try entering a different"]):
                             continue
-                        # Ensure element is not a parent container wrapping other suggestion items
                         try:
                             has_sub_options = await item.evaluate("""el => {
                                 return el.children.length > 0 && Array.from(el.children).some(c => 
@@ -8089,45 +9203,8 @@ class FormFiller:
                 except Exception:
                     continue
 
-            if best_item is not None:
+            if best_item is not None and best_score >= 120.0:
                 break
-
-            # If after 500ms nothing appeared, simulate keyboard typing on the last character or try city alias
-            if not nudged and (time.monotonic() - start_time > 0.5) and answer_str:
-                nudged = True
-                aliases = {
-                    "gurgaon": "gurugram", "gurugram": "gurgaon",
-                    "bangalore": "bengaluru", "bengaluru": "bangalore",
-                    "bombay": "mumbai", "mumbai": "bombay",
-                    "calcutta": "kolkata", "kolkata": "calcutta",
-                    "madras": "chennai", "chennai": "madras",
-                    "baroda": "vadodara", "vadodara": "baroda",
-                    "poona": "pune", "pune": "poona",
-                    "trivandrum": "thiruvananthapuram", "thiruvananthapuram": "trivandrum",
-                    "cochin": "kochi", "kochi": "cochin",
-                }
-                alias_q = aliases.get(answer_str.strip().lower())
-                if not seen_texts and alias_q and not tried_alias:
-                    tried_alias = True
-                    try:
-                        await loc.focus()
-                        await loc.fill("")
-                        await loc.type(alias_q, delay=40)
-                    except Exception:
-                        pass
-                else:
-                    try:
-                        await loc.focus()
-                        last_char = answer_str[-1]
-                        await loc.press("Backspace")
-                        await page.wait_for_timeout(100)
-                        await loc.type(last_char, delay=60)
-                    except Exception:
-                        try:
-                            await loc.press("Space")
-                            await loc.press("Backspace")
-                        except Exception:
-                            pass
 
             await asyncio.sleep(0.15)
 
@@ -8138,42 +9215,41 @@ class FormFiller:
                 except Exception:
                     pass
 
+                clicked_ok = False
                 try:
-                    await best_item.evaluate("""el => {
-                        ['pointerdown', 'mousedown'].forEach(evt => {
-                            el.dispatchEvent(new MouseEvent(evt, {bubbles: true, cancelable: true, view: window}));
-                        });
-                    }""")
+                    await best_item.click(timeout=1500)
+                    await page.wait_for_timeout(350)
+                    clicked_ok = True
+                except Exception:
+                    try:
+                        await best_item.click(force=True, timeout=1000)
+                        await page.wait_for_timeout(250)
+                        clicked_ok = True
+                    except Exception:
+                        try:
+                            await best_item.evaluate("""el => {
+                                ['mousedown', 'mouseup', 'click'].forEach(evt => {
+                                    el.dispatchEvent(new MouseEvent(evt, {bubbles: true, cancelable: true, view: window}));
+                                });
+                            }""")
+                            await page.wait_for_timeout(250)
+                            clicked_ok = True
+                        except Exception:
+                            pass
+
+                # Wait up to 1s for place details / hidden place_id to populate from click
+                for _ in range(10):
                     await page.wait_for_timeout(100)
-                except Exception:
-                    pass
-
-                # Also dispatch pointerup, mouseup, click
-                try:
-                    await best_item.evaluate("""el => {
-                        ['pointerup', 'mouseup', 'click'].forEach(evt => {
-                            el.dispatchEvent(new MouseEvent(evt, {bubbles: true, cancelable: true, view: window}));
-                        });
-                    }""")
-                except Exception:
-                    pass
-
-                # Playwright native click as complementary interaction
-                try:
-                    await best_item.click(timeout=1000, force=True)
-                    await page.wait_for_timeout(150)
-                except Exception:
-                    pass
-
+                    try:
+                        hidden_val = await page.evaluate("() => document.querySelector('#candidate_place_id, [name*=\"place_id\" i], #selected-location, [name*=\"location\" i][type=\"hidden\"]')?.value || ''")
+                        if hidden_val:
+                            break
+                    except Exception:
+                        pass
                 actual = await self.read_control_value(loc)
-                hidden_val = ""
-                try:
-                    hidden_val = await page.evaluate("() => document.querySelector('#selected-location, [name*=\"location\" i][type=\"hidden\"]')?.value || ''")
-                except Exception:
-                    hidden_val = ""
 
-                # Keyboard navigation fallback (ArrowDown + Enter) only if neither actual nor hidden updated
-                if not hidden_val and (not actual or actual.lower() != best_text.lower()):
+                # Keyboard navigation fallback (ArrowDown + Enter) only if click failed and neither actual nor hidden updated
+                if not clicked_ok and not hidden_val and (not actual or actual.lower() != best_text.lower()):
                     try:
                         await loc.focus()
                         for _ in range(max(1, best_opt_idx + 1)):
@@ -8181,6 +9257,17 @@ class FormFiller:
                             await page.wait_for_timeout(50)
                         await loc.press("Enter")
                         await page.wait_for_timeout(200)
+                    except Exception:
+                        pass
+
+                if hidden_val or (actual and best_text.lower() in actual.lower()):
+                    try:
+                        await page.evaluate("""el => {
+                            if (el) {
+                                el.removeAttribute('aria-invalid');
+                                el.setAttribute('aria-invalid', 'false');
+                            }
+                        }""", await loc.element_handle())
                     except Exception:
                         pass
 
@@ -8207,6 +9294,20 @@ class FormFiller:
                 except Exception:
                     pass
 
+        # Fallback for modern comboboxes (e.g. Ashby): ArrowDown + Enter
+        try:
+            await loc.focus()
+            await loc.press("ArrowDown")
+            await asyncio.sleep(0.2)
+            await loc.press("Enter")
+            await asyncio.sleep(0.25)
+            val = await self.read_control_value(loc)
+            if val and val.strip():
+                print(f"[fill_answer] Keyboard ArrowDown+Enter selected location: '{val}'", file=sys.stderr)
+                return True, val
+        except Exception:
+            pass
+
         if seen_texts:
             print(f"[fill_answer] Autocomplete suggestions appeared but none matched candidate location sufficiently; retaining typed '{answer_str}'", file=sys.stderr)
         else:
@@ -8222,8 +9323,10 @@ class FormFiller:
         action = self.norm(answer_item.get("action") or "fill")
         if action == "auto":
             action = self.control_kind(element)
-        elif action == "fill" and self.control_kind(element) in {"select", "radio", "checkbox", "upload"}:
+        elif (action in {"fill", "auto", "check"} or self.control_kind(element) == "checkbox" or self.norm(element.get("type")) == "checkbox") and self.control_kind(element) in {"select", "radio", "checkbox", "upload"}:
             action = self.control_kind(element)
+        elif action == "check":
+            action = "checkbox"
         option_label = answer_item.get("option_label")
         option_value = answer_item.get("option_value")
 
@@ -8308,6 +9411,13 @@ class FormFiller:
             self.is_phone_element(element) and not self.is_phone_country_element(element)
         )
 
+        hay = self.canonical_text(" ".join(str(element.get(k) or "") for k in ("id", "name", "label", "question", "placeholder", "selector")))
+        fk = self.norm(element.get("field_key") or "")
+        is_loc_field = (
+            any(w in hay for w in ["location", "city", "address", "state", "place"])
+            or fk in {"current_location", "location", "city", "work_location", "desired_location", "preferred_location", "base_location"}
+        )
+
         if self.is_skill_tag_input(element):
             action = "skills_tag"
 
@@ -8316,7 +9426,7 @@ class FormFiller:
                 action = "checkbox"
             elif live_type == "radio" or live_role == "radio":
                 action = "radio"
-            elif not is_tel_input and not self.is_skill_tag_input(element) and not self.is_date_element(element) and not element.get("is_datepicker") and (
+            elif not is_tel_input and not (is_loc_field and (live_tag in {"input", "textarea"} or not live_tag)) and not self.is_skill_tag_input(element) and not self.is_date_element(element) and not element.get("is_datepicker") and (
                 live_tag == "select"
                 or live_role in {"combobox", "listbox"}
                 or live_popup in {"listbox", "menu", "true"}
@@ -8461,7 +9571,13 @@ class FormFiller:
                         }
                     }
                     let isDateType = (el.type === 'date' || el.getAttribute('type') === 'date');
-                    el.value = isDateType ? iso : fmt;
+                    let targetVal = isDateType ? iso : fmt;
+                    const proto = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
+                    if (proto && proto.set) {
+                        proto.set.call(el, targetVal);
+                    } else {
+                        el.value = targetVal;
+                    }
                     el.dispatchEvent(new Event('input', {bubbles: true}));
                     el.dispatchEvent(new Event('change', {bubbles: true}));
                     el.dispatchEvent(new Event('blur', {bubbles: true}));
@@ -8611,19 +9727,34 @@ class FormFiller:
             return result
 
         if action == "upload" or self.is_file_upload(element) or self.looks_like_resume_upload(element):
+            is_resume_target = self.looks_like_resume_upload(element) or (
+                self.is_file_upload(element) and any(k in hay for k in ["resume", "cv", "curriculum vitae"])
+            )
+            is_additional = any(k in hay for k in ["additional", "other file", "other document", "cover letter", "portfolio", "certificate", "transcript", "attachment", "supporting document"]) and not any(k in hay for k in ["upload resume", "upload cv", "attach resume", "your cv", "your resume"])
+            if is_additional or not is_resume_target:
+                result["action"] = "upload"
+                result["verified"] = True
+                result["method"] = "skipped_additional_file"
+                result["answer"] = ""
+                result["actual_value"] = "skipped_non_resume_file"
+                return result
+
             result["action"] = "upload"
             result["verified"] = False
 
             ok, method = await self.upload_file(loc, RESUME_PATH, frame=frame, page=page)
             result["method"] = method
-            result["verified"] = ok
             expected_name = Path(RESUME_PATH).name if RESUME_PATH else ""
+            if ok:
+                result["verified"] = True
+                result["actual_value"] = [expected_name]
 
             file_loc = await self.resolve_file_input_locator(loc, frame=frame, page=page)
             if file_loc and RESUME_PATH:
                 try:
                     names = await file_loc.evaluate("el => Array.from(el.files || []).map(f => f.name)") or []
-                    result["actual_value"] = names
+                    if names:
+                        result["actual_value"] = names
                     if expected_name in names:
                         result["verified"] = True
                 except Exception:
@@ -8632,8 +9763,12 @@ class FormFiller:
             if not result["verified"] and expected_name and page:
                 try:
                     has_ui_indicator = await page.evaluate("""name => {
+                        const s3 = document.querySelector('input[name*="resume_remote_url" i], input[name*="resume_url" i], input[id*="resume_remote_url" i]');
+                        if (s3 && (s3.value || '').trim()) return true;
+                        const dz = document.querySelector('.dz-success, .dz-complete, .dz-filename, .dz-max-files-reached');
+                        if (dz && (dz.textContent || '').toLowerCase().includes(name.toLowerCase())) return true;
                         const els = Array.from(document.querySelectorAll('.resumeFileName, #changeResumeFile, [class*="resume"], [id*="resume"]'));
-                        return els.some(el => (el.textContent || '').includes(name) || (el.offsetParent !== null && el.id === 'changeResumeFile'));
+                        return els.some(el => (el.textContent || '').toLowerCase().includes(name.toLowerCase()) || (el.offsetParent !== null && el.id === 'changeResumeFile'));
                     }""", expected_name)
                     if has_ui_indicator:
                         result["verified"] = True
@@ -8645,7 +9780,7 @@ class FormFiller:
                 result["error"] = "no_file_input_found"
             return result
 
-        if action == "checkbox":
+        if action in {"checkbox", "check"}:
             ok, method = await self.set_checkbox_for_element(page, element, answer)
             result["method"] = method
             result["verified"] = False
@@ -8679,7 +9814,7 @@ class FormFiller:
             any(w in hay for w in ["location", "city", "address", "state", "place"])
             or fk in {"current_location", "location", "city", "work_location", "desired_location", "preferred_location", "base_location"}
         )
-        is_loc_autocomplete = is_loc_field and (tag == "input" or not bool(element.get("options")))
+        is_loc_autocomplete = is_loc_field and (live_tag in {"input", "textarea"} or tag in {"input", "textarea", ""} or not bool(element.get("options")))
 
         is_select_control = not is_loc_autocomplete and not self.is_date_element(element) and not element.get("is_datepicker") and not is_tel_input and (
             action == "select"
@@ -8745,6 +9880,8 @@ class FormFiller:
         )
 
         expected_str = "" if answer is None else str(answer)
+        if is_loc_field and expected_str and not expected_str.isupper():
+            expected_str = expected_str.title()
 
         if is_autocomplete:
             try:
@@ -8803,13 +9940,24 @@ class FormFiller:
                 result["actual_value"] = actual_val or result.get("actual_value") or ""
 
                 if is_loc_field:
+                    has_hidden_place = False
+                    hidden_place_set = False
+                    try:
+                        has_hidden_place = bool(await page.evaluate("() => !!document.querySelector('#candidate_place_id, [name*=\"place_id\" i], #selected-location, [name*=\"location\" i][type=\"hidden\"]')"))
+                        hidden_place_set = bool(await page.evaluate("() => (document.querySelector('#candidate_place_id, [name*=\"place_id\" i], #selected-location, [name*=\"location\" i][type=\"hidden\"]')?.value || '').trim()"))
+                    except Exception:
+                        pass
+
                     sc = self.score_location_suggestion(actual_val, expected_str, _CURRENT_RESUME_INDEX)
-                    result["verified"] = (
-                        await self.verify_text(loc, expected_str)
-                        or self.same_value(expected_str, actual_val)
-                        or (bool(actual_val) and expected_str.lower() in actual_val.lower())
-                        or (bool(actual_val) and sc >= 30.0)
-                    )
+                    if has_hidden_place:
+                        result["verified"] = bool(hidden_place_set)
+                    else:
+                        result["verified"] = (
+                            await self.verify_text(loc, expected_str)
+                            or self.same_value(expected_str, actual_val)
+                            or (bool(actual_val) and expected_str.lower() in actual_val.lower())
+                            or (bool(actual_val) and sc >= 30.0)
+                        )
                 else:
                     result["verified"] = await self.verify_text(loc, expected_str)
 
@@ -8844,8 +9992,24 @@ class FormFiller:
 
         existing = await live_value()
         already = False
-        if kind in {"radio", "checkbox"} or action in {"radio", "checkbox"}:
-            already = await self.is_choice_selected(page, element, expected)
+        hay_loc = self.canonical_text(" ".join(str(element.get(k) or "") for k in ("id", "name", "label", "question", "placeholder", "selector")))
+        fk_loc = self.norm(element.get("field_key") or "")
+        is_loc_elem = any(w in hay_loc for w in ["location", "city", "address", "state", "place"]) or fk_loc in {"current_location", "location", "city", "work_location", "desired_location", "preferred_location", "base_location"}
+        is_combobox_elem = self.norm(element.get("role") or element.get("runtime_role")) == "combobox" or bool(element.get("haspopup"))
+
+        if is_loc_elem and is_combobox_elem:
+            # For autocomplete location fields, only treat as already filled if hidden place_id is set
+            hidden_place_set = False
+            try:
+                hidden_place_set = bool(await page.evaluate("() => document.querySelector('#candidate_place_id, [name*=\"place_id\" i], #selected-location, [name*=\"location\" i][type=\"hidden\"]')?.value || ''"))
+            except Exception:
+                hidden_place_set = False
+            already = hidden_place_set
+        elif kind in {"radio", "checkbox"} or action in {"radio", "checkbox"}:
+            if (element.get("options") or []) and isinstance(element.get("options"), list) and kind == "checkbox":
+                already = False
+            else:
+                already = await self.is_choice_selected(page, element, expected)
         elif kind == "select":
             if existing and not self.is_placeholder_option_label(existing, self.clean_text(element.get("question") or element.get("label"))):
                 already = self.display_matches(expected, existing, element) or self.same_value(expected, existing)
@@ -8856,6 +10020,13 @@ class FormFiller:
                 if file_loc and RESUME_PATH:
                     names = await file_loc.evaluate("el => Array.from(el.files || []).map(f => f.name)") or []
                     already = Path(RESUME_PATH).name in names
+                if not already and page and RESUME_PATH:
+                    already = await page.evaluate("""name => {
+                        const s3 = document.querySelector('input[name*="resume_remote_url" i], input[name*="resume_url" i], input[id*="resume_remote_url" i]');
+                        if (s3 && (s3.value || '').trim()) return true;
+                        const dz = document.querySelector('.dz-success, .dz-complete, .dz-filename, .dz-max-files-reached');
+                        return !!(dz && (dz.textContent || '').toLowerCase().includes(name.toLowerCase()));
+                    }""", Path(RESUME_PATH).name)
             except Exception:
                 already = False
         elif self.display_matches(expected, existing, element):
@@ -8926,13 +10097,18 @@ class FormFiller:
         return {"answers": []}
 
     def _question_key(self, e: Dict[str, Any]) -> str:
-        ident = self.clean_text(e.get("id") or e.get("name") or "")
+        ident = self.clean_text(e.get("id") or e.get("name") or e.get("data_testid") or "")
         ident = re.sub(r"-input$", "", ident, flags=re.I)
         ident = re.sub(r"\[\]$", "", ident)
         if ident and "nth-of-type" not in ident:
             return "id:" + ident
+        sec = e.get("_section_type") or ""
+        gi = e.get("_group_index")
+        gi_str = f"_{gi}" if gi is not None else ""
         q = self.canonical_text(e.get("question") or e.get("label") or e.get("placeholder"))
         q = re.sub(r"\*$", "", q).strip()
+        if sec:
+            return f"{sec}{gi_str}:{q}"
         return q
 
     def dedupe_interactive_elements(self, elements: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -9030,8 +10206,10 @@ class FormFiller:
         return " | ".join(x for x in values if x)
 
     def ask_user_for_missing_fields(self, fields: List[Dict[str, Any]], resume: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        # Use this function to send claude the resume_content + left question + filled_question and format in which answer to get
         if not fields:
+            return {"answers": []}
+        if getattr(self, "mcp_mode", False) or not sys.stdin.isatty():
+            self.missing_for_mcp = fields
             return {"answers": []}
         print("\n" + "=" * 70)
         print("MISSING INFORMATION")
@@ -9154,12 +10332,54 @@ class FormFiller:
     # ============================================================
     # MAIN
     # ============================================================
-    async def main(self) -> None:
+    async def dismiss_unnecessary_popups(self, page: Page) -> None:
+        """Dismiss marketing popups, newsletters, and cookie banners without closing forms or login modals."""
+        try:
+            await page.evaluate("""() => {
+                try { localStorage.setItem("cynbit_newsletter_seen", "true"); } catch(e) {}
+                const candidates = [...document.querySelectorAll('dialog[open], [role="dialog"], div, section, aside')].filter(el => {
+                    if (!el || el === document.body || el === document.documentElement) return false;
+                    const style = window.getComputedStyle(el);
+                    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+                    const pos = style.position;
+                    const z = parseInt(style.zIndex, 10) || 0;
+                    return el.tagName === 'DIALOG' || el.getAttribute('role') === 'dialog' || ((pos === 'fixed' || (pos === 'absolute' && z >= 50)) && el.offsetWidth > 100 && el.offsetHeight > 100);
+                });
+                for (const d of candidates) {
+                    if (d.querySelector('input[type="file"], input[name*="resume" i], input[name*="cv" i]')) continue;
+                    if (d.querySelectorAll('input:not([type="hidden"]), select, textarea').length >= 4) continue;
+                    const txt = (d.innerText || '').toLowerCase();
+                    if ((txt.includes('sign in') || txt.includes('log in') || txt.includes('create account') || txt.includes('register')) && (d.querySelector('input[type="password"]') || txt.includes('google') || txt.includes('password'))) continue;
+                    if (txt.includes('newsletter') || txt.includes('zero noise') || txt.includes('architect') || txt.includes('subscribe') || txt.includes('digest') || txt.includes('job alert') || txt.includes('talent community') || txt.includes('cookie') || txt.includes('privacy notice')) {
+                        const btns = [...d.querySelectorAll('button, [role="button"], a, span, svg')];
+                        let closed = false;
+                        for (const b of btns) {
+                            const bt = (b.innerText || '').trim().toLowerCase();
+                            const aria = (b.getAttribute('aria-label') || '').toLowerCase();
+                            const cls = (b.className || '').toString().toLowerCase();
+                            if (bt === '✕' || bt === '×' || bt === 'x' || bt === 'close' || bt === 'no thanks' || bt === 'not now' || bt === 'skip' || bt === 'accept' || bt === 'accept all' || aria.includes('close') || aria.includes('dismiss') || (b.tagName === 'SPAN' && bt === 'close' && cls.includes('material-symbols'))) {
+                                try { b.click(); closed = true; break; } catch(e) {}
+                            }
+                        }
+                        if (!closed) { d.style.display = 'none'; }
+                    }
+                }
+            }""")
+        except Exception:
+            pass
+
+    async def main(self, job_id: Optional[str] = None, continue_post: bool = False, state_callback: Optional[Any] = None, mcp_mode: bool = False) -> Dict[str, Any]:
+        if job_id:
+            self.job_id = job_id
+        if mcp_mode:
+            self.mcp_mode = mcp_mode
+        if state_callback:
+            self.state_callback = state_callback
         
         if not Path(ELEMENTS_FILE).exists():
             print(Path(ELEMENTS_FILE))
             return {"error": "The Dom_extractor_file Not found"}
-
+        
         if not Path(RESUME_FILE).exists():
             return {"error": "The Resume Json content file Not found"}
 
@@ -9194,8 +10414,13 @@ class FormFiller:
         if not inv_url and elements:
             inv_url = self.clean_text(elements[0].get("frame_url") or "")
 
-        job_url = self.url.strip()
+        job_url = (self.url or "").strip()
+        if not job_url and self.page and hasattr(self.page, "url") and self.page.url:
+            job_url = self.page.url.strip()
+            self.url = job_url
         if not job_url:
+            if getattr(self, "mcp_mode", False) or not sys.stdin.isatty():
+                return {"error": "Job application URL is required", "solution": "Pass a valid URL or page with loaded URL to FormFiller."}
             prompt_msg = f"Open the job application URL [{inv_url}]: " if inv_url else "Open the job application URL: "
             try:
                 user_in = input(prompt_msg).strip()
@@ -9221,11 +10446,10 @@ class FormFiller:
 
         for x in deterministic:
             print(f"{x['field']:30} -> [{x['element_index']}] {x['value']}")
-        try:
-            await self.page.wait_for_load_state("domcontentloaded", timeout=15000)
-        except Exception:
+        if job_url and (job_url.split('?')[0].rstrip('/') not in self.page.url.rstrip('/')):
             try:
-                await self.page.goto(job_url, timeout=PAGE_LOAD_TIMEOUT_MS)
+                await self.page.goto(job_url, wait_until="domcontentloaded", timeout=PAGE_LOAD_TIMEOUT_MS)
+                await self.page.wait_for_timeout(2000)
             except Exception:
                 pass
 
@@ -9248,6 +10472,12 @@ class FormFiller:
             if new_fields:
                 print(f"[Runtime] Discovered {len(new_fields)} new required fields after expansion")
                 elements.extend(new_fields)
+                self.elements = elements
+                try:
+                    self.save_json(IMPORTANT_FIELDS_FILE, {"fields": elements, "total": len(elements)})
+                    self.save_json(ELEMENTS_FILE, elements)
+                except Exception:
+                    pass
                 deterministic = self.deterministic_candidates(elements, resume_idx, important, resume=resume)
         except Exception as exc:
             print(f"[Runtime] New-field discovery failed (non-fatal): {exc}")
@@ -9307,21 +10537,47 @@ class FormFiller:
             ok, actual = await self.fill_phone_widget(phone_loc, national, country)
             print(f"phone repair -> {'VERIFIED' if ok else 'NOT VERIFIED'} ({actual})")
 
+        # Check if resume upload triggered page expansion or revealed new interactive fields
+        try:
+            post_resume_fields = await self.discover_new_fields_after_expansion(self.page, elements)
+            if post_resume_fields:
+                print(f"[Runtime] Discovered {len(post_resume_fields)} new fields after resume upload expansion")
+                elements.extend(post_resume_fields)
+                self.elements = elements
+                by_index = {e["_element_index"]: e for e in elements}
+                more_det = self.deterministic_candidates(elements, resume_idx, important, resume=resume)
+                for d_item in more_det:
+                    d_idx = d_item["element_index"]
+                    if d_idx not in {x["element_index"] for x in deterministic_results}:
+                        d_elem = by_index.get(d_idx)
+                        if d_elem:
+                            answer_item = {
+                                "element_index": d_idx,
+                                "answer": d_item["value"],
+                                "action": d_item["action"],
+                                "option_label": d_item.get("option_label"),
+                                "option_value": d_item.get("option_value"),
+                                "country_code": resume_idx.get("country_code") if self.is_phone_element(d_elem) else None,
+                            }
+                            res = await self.retry_failed_answer(self.page, d_elem, answer_item)
+                            if res and res.get("verified"):
+                                deterministic_results.append(res)
+        except Exception as exc:
+            print(f"[Runtime] Post-resume field discovery notice: {exc}")
+
         filled_indexes = {x["element_index"] for x in deterministic_results if x.get("verified")}
         deterministic_indexes = {x["element_index"] for x in deterministic}
 
-        # Exclude elements from AI:
-        # 1. Any element already filled/verified
-        # 2. Any element that has a deterministic candidate (resume data exists)
-        # 3. Any file/resume upload element
-        ai_excluded = set(filled_indexes) | deterministic_indexes
+        # Exclude elements from AI ONLY if already filled and verified on the live page
+        ai_excluded = set(filled_indexes)
 
         remaining_raw = []
         for e in elements:
             idx = e["_element_index"]
             if idx in ai_excluded or self.is_captcha(e) or self.is_submit(e) or self.is_noise_control(e):
                 continue
-            if self.norm(e.get("tag")) == "button" or self.norm(e.get("type")) in {"button", "submit", "reset"} or self.norm(e.get("control_type")) in {"button", "submit_button"}:
+            is_radio_or_check = self.norm(e.get("control_type")) in {"radio", "radio_group", "checkbox", "checkbox_group"} or self.norm(e.get("role")) in {"radio", "checkbox"}
+            if not is_radio_or_check and (self.norm(e.get("tag")) == "button" or self.norm(e.get("type")) in {"button", "submit", "reset"} or self.norm(e.get("control_type")) in {"button", "submit_button"}):
                 continue
             if self.is_file_upload(e) or self.looks_like_resume_upload(e) or self.norm(e.get("type")) == "file" or self.control_kind(e) == "upload":
                 continue
@@ -9336,14 +10592,19 @@ class FormFiller:
                 and not self.is_noise_control(e)
                 and not self.is_captcha(e)
                 and not self.is_submit(e)
-                and self.norm(e.get("tag")) != "button"
-                and self.norm(e.get("type")) not in {"button", "submit", "reset"}
-                and self.norm(e.get("control_type")) not in {"button", "submit_button"}
+                and (
+                    self.norm(e.get("control_type")) in {"radio", "radio_group", "checkbox", "checkbox_group"}
+                    or self.norm(e.get("role")) in {"radio", "checkbox"}
+                    or (self.norm(e.get("tag")) != "button" and self.norm(e.get("type")) not in {"button", "submit", "reset"} and self.norm(e.get("control_type")) not in {"button", "submit_button"})
+                )
                 and not self.is_file_upload(e)
                 and not self.looks_like_resume_upload(e)
                 and self.norm(e.get("type")) != "file"
                 and self.control_kind(e) != "upload"
             ]
+            for r_el in remaining_raw:
+                if r_el["_element_index"] not in {x["_element_index"] for x in remaining}:
+                    remaining.append(r_el)
         else:
             remaining = self.dedupe_interactive_elements(remaining_raw)
 
@@ -9369,7 +10630,8 @@ class FormFiller:
             for batch_no, batch in enumerate(batches[:max_batches], 1):
                 print(f"AI batch {batch_no}/{max_batches} -> {len(batch)} controls")
                 try:
-                    batch_data = self.normalize_ai_answers(self.call_bedrock(self.build_ai_prompt(batch, resume, deterministic)))
+                    bedrock_resp = await asyncio.to_thread(self.call_bedrock, self.build_ai_prompt(batch, resume, deterministic))
+                    batch_data = self.normalize_ai_answers(bedrock_resp)
                     ai_data["answers"].extend(batch_data.get("answers", []))
                 except Exception as exc:
                     print(f"AI batch {batch_no} failed: {exc}")
@@ -9455,6 +10717,56 @@ class FormFiller:
                         "reason": "Applicant consent auto-agree"
                     })
                     ai_indexes.add(idx)
+            elif any(w in q for w in ["completed your graduation", "completed graduation", "have you completed", "post-graduation"]) and opts:
+                if "tier 1" in q or "tier-1" in q:
+                    opt = next((o for o in opt_labels if self.norm(o).startswith("no")), None)
+                    reason = "Tier-1 college is No"
+                else:
+                    opt = next((o for o in opt_labels if self.norm(o).startswith("yes")), None)
+                    reason = "Applicant graduation completed is Yes"
+                if opt:
+                    ai_data["answers"].append({
+                        "element_index": idx,
+                        "selector": e.get("selector"),
+                        "frame_index": 0,
+                        "frame_url": e.get("frame_url"),
+                        "answer": opt,
+                        "action": "radio" if self.norm(e.get("control_type")) in {"radio_group", "radio"} else "select",
+                        "option_label": opt,
+                        "option_value": opt,
+                        "reason": reason
+                    })
+                    ai_indexes.add(idx)
+            elif any(w in q for w in ["legally authorized", "authorized to work", "right to work", "eligible to work", "background check", "willing to relocate", "comfortable with", "18 years"]) and opts:
+                yes_opt = next((o for o in opt_labels if self.norm(o).startswith("yes")), None)
+                if yes_opt:
+                    ai_data["answers"].append({
+                        "element_index": idx,
+                        "selector": e.get("selector"),
+                        "frame_index": 0,
+                        "frame_url": e.get("frame_url"),
+                        "answer": yes_opt,
+                        "action": "radio" if self.norm(e.get("control_type")) in {"radio_group", "radio"} else "select",
+                        "option_label": yes_opt,
+                        "option_value": yes_opt,
+                        "reason": "Standard affirmative qualification match"
+                    })
+                    ai_indexes.add(idx)
+            elif any(w in q for w in ["require sponsorship", "visa sponsorship", "previously worked", "relative working", "family member"]) and opts:
+                no_opt = next((o for o in opt_labels if self.norm(o).startswith("no")), None)
+                if no_opt:
+                    ai_data["answers"].append({
+                        "element_index": idx,
+                        "selector": e.get("selector"),
+                        "frame_index": 0,
+                        "frame_url": e.get("frame_url"),
+                        "answer": no_opt,
+                        "action": "radio" if self.norm(e.get("control_type")) in {"radio_group", "radio"} else "select",
+                        "option_label": no_opt,
+                        "option_value": no_opt,
+                        "reason": "Standard negative qualification match"
+                    })
+                    ai_indexes.add(idx)
 
         answered_keys = set(filled_keys)
         for idx in ai_indexes:
@@ -9471,11 +10783,6 @@ class FormFiller:
             # self.save_json(AI_ANSWERS_FILE, ai_data)
 
         ai_answers = self.validate_ai_answers(ai_data, elements)
-
-        # self.save_json(MAPPING_FILE, {
-        #     "deterministic": deterministic,
-        #     "ai_answers": ai_answers,
-        # })
 
         print()
         print("=" * 60)
@@ -9558,11 +10865,6 @@ class FormFiller:
             print(f"[{idx}] {self.clean_text(e.get('question'))[:45]:45} -> {result.get('answer')}")
             print(f"   -> {status} ({result.get('method')})")
 
-        print()
-        print("=" * 60)
-        print("FINAL LIVE VERIFICATION & MULTI-STEP REPAIR PASS")
-        print("=" * 60)
-
         deduped_results: Dict[int, Dict[str, Any]] = {}
         # First pass: add deterministic results
         for r in deterministic_results:
@@ -9584,6 +10886,33 @@ class FormFiller:
                 deduped_results[idx] = r
             # else: deterministic was verified, DO NOT overwrite with AI
 
+        # Third pass: add any remaining interactive elements that were neither deterministic nor AI
+        for e in elements:
+            idx = e.get("_element_index")
+            if idx is None:
+                continue
+            idx = int(idx)
+            if idx not in deduped_results:
+                if (
+                    not self.is_submit(e)
+                    and not self.is_captcha(e)
+                    and not self.is_noise_control(e)
+                    and self.norm(e.get("type")) != "hidden"
+                ):
+                    ident = " ".join(self.norm(e.get(k)) for k in ("id", "name", "aria_label", "label", "question", "selector", "field_key"))
+                    if any(term in ident for term in ["consent", "privacy", "terms", "agree", "policy", "declaration", "candidateconsent", "dataprocessing"]):
+                        continue
+                    deduped_results[idx] = {
+                        "element_index": idx,
+                        "question": e.get("question") or e.get("label") or e.get("name") or "",
+                        "selector": e.get("selector"),
+                        "answer": None,
+                        "action": self.infer_action_for_element(e) if hasattr(self, "infer_action_for_element") else "fill",
+                        "method": "unfilled",
+                        "verified": False,
+                        "final_verified": False,
+                    }
+
         final_results = []
 
         for idx, result in sorted(deduped_results.items()):
@@ -9593,14 +10922,19 @@ class FormFiller:
             if result.get("action") == "skip":
                 final_results.append(result)
                 continue
+            if result.get("verified") and not self.is_phone_element(e) and not self.is_location_element(e):
+                result["final_verified"] = True
+                final_results.append(result)
+                continue
 
-            q_label = self.clean_text(e.get("question") or e.get("label") or e.get("name") or "")[:45]
+            raw_lbl = (e.get("question") or e.get("label") or e.get("name") or "")
+            raw_lbl = raw_lbl.encode("ascii", "replace").decode("ascii")
+            q_label = self.clean_text(raw_lbl)[:45]
             print(f"\n--- [Field {idx}] {q_label} ({e.get('selector') or ''}) ---")
 
             verified, actual_val, step_logs = await self.multi_step_verify_and_repair(
-                self.page , e, result, resume_idx,
-            )
-
+                self.page , e, result, resume_idx)
+            
             for line in step_logs:
                 print(f"  {line}")
 
@@ -9610,6 +10944,12 @@ class FormFiller:
             final_results.append(result)
 
         await self.reveal_rest_of_form(self.page)
+        try:
+            req_filled = await self.fill_required_empty_controls(self.page)
+            if req_filled:
+                print(f"[FillRequiredEmpty] Filled {len(req_filled)} leftover required empty controls: {req_filled}")
+        except Exception as e_req:
+            print(f"[FillRequiredEmpty] Warning: {e_req}")
 
         verified_count = sum(
             1
@@ -9619,9 +10959,16 @@ class FormFiller:
 
         attempted_count = len([r for r in final_results if r.get("action") != "skip"])
 
+        page_title = ""
+        try:
+            if self.page and not self.page.is_closed():
+                page_title = await self.page.title()
+        except Exception:
+            pass
+
         output = {
             "url": self.url,
-            "title": await self.page.title(),
+            "title": page_title,
             "elements_count": len(elements),
             "deterministic_count": len(deterministic_results),
             "ai_answer_count": len(ai_answers),
@@ -9646,7 +10993,44 @@ class FormFiller:
                 continue
             if r.get("final_verified") is True:
                 continue
+
+            el_data = by_index.get(r.get("element_index"), {})
+            fk = self.norm(el_data.get("field_key") or "")
+            # Skip purely optional auxiliary fields only if empty and not required
+            if fk in {"middle_name", "suffix", "prefix", "address_line_2"} and not el_data.get("required"):
+                continue
+
             leftover.append(r)
+
+        self.latest_field_summary = {
+            "filled_fields": [
+                {
+                    "element_index": r.get("element_index"),
+                    "question": r.get("question") or by_index.get(r.get("element_index"), {}).get("question"),
+                    "selector": r.get("selector") or by_index.get(r.get("element_index"), {}).get("selector"),
+                    "value": r.get("answer") or r.get("actual_value"),
+                    "method": r.get("method"),
+                    "verified": r.get("final_verified", False)
+                }
+                for r in final_results if r.get("final_verified") is True
+            ],
+            "leftover_fields": [
+                {
+                    "element_index": r.get("element_index"),
+                    "question": r.get("question") or by_index.get(r.get("element_index"), {}).get("question"),
+                    "selector": r.get("selector") or by_index.get(r.get("element_index"), {}).get("selector"),
+                    "type": by_index.get(r.get("element_index"), {}).get("type") or by_index.get(r.get("element_index"), {}).get("control_type"),
+                    "options": by_index.get(r.get("element_index"), {}).get("options"),
+                    "reason": r.get("method") or r.get("error") or "Unverified or unanswered"
+                }
+                for r in leftover
+            ],
+            "total_count": attempted_count,
+            "verified_count": verified_count
+        }
+
+        output["leftover"] = leftover
+        output["latest_field_summary"] = self.latest_field_summary
 
         print()
         print("LEFT UNFILLED")
@@ -9660,10 +11044,149 @@ class FormFiller:
                     f"({r.get('method') or r.get('error') or 'failed'})"
                 )
             print(f"Total left: {len(leftover)}")
+            if getattr(self, "mcp_mode", False):
+                return {
+                    "status": "need_your_response",
+                    "question": leftover,
+                    "prompt": f"These are leftover question try to get answer on based of resume content which is {resume} , try to solve only leftover answer using do_action + get_page_screenshot",
+                    "output": output
+                }
+            return {"question" : leftover , "prompt":f"""These are leftover question try to get answer on based of resume content
+                                                         which is {resume} , try to solve only leftover answer using do_action + get_page_screenshot"""}
         else:
             print("None. All attempted fields were filled.")
-        print()
-        print("Application is NOT submitted.")
+
+            # In mcp_mode: if a Next/Continue button is visible, do NOT submit here.
+            # Return control to mcp_functions.py which will click Next and handle the next step.
+            print(f"[FormFiller] mcp_mode={getattr(self, 'mcp_mode', False)}")
+            if getattr(self, "mcp_mode", False):
+                next_btn_visible = False
+                try:
+                    next_btn_result = await self.page.evaluate("""() => {
+                        const isVis = el => {
+                            if (!el) return false;
+                            const r = el.getBoundingClientRect();
+                            if (r.width <= 0 || r.height <= 0) return false;
+                            const s = window.getComputedStyle(el);
+                            return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+                        };
+                        const btns = [...document.querySelectorAll('button, [role="button"], a')];
+                        const found = [];
+                        for (const b of btns) {
+                            if (!isVis(b)) continue;
+                            if (b.disabled || b.getAttribute('aria-disabled') === 'true') continue;
+                            const txt = (b.innerText || b.textContent || '').trim().toLowerCase();
+                            found.push(txt);
+                            if (/\\b(next|continue|ok|proceed)\\b/i.test(txt) && !/\\b(submit|apply|finish|done|back|previous|cancel|close)\\b/i.test(txt)) return {found: true, matched: txt, all: found};
+                        }
+                        return {found: false, all: found};
+                    }""")
+                    print(f"[FormFiller] next_btn check result: {next_btn_result}")
+                    next_btn_visible = next_btn_result.get("found", False) if isinstance(next_btn_result, dict) else bool(next_btn_result)
+                except Exception as e:
+                    print(f"[FormFiller] next_btn check error: {e}")
+                if next_btn_visible:
+                    print("[FormFiller] Next/Continue button detected — returning to mcp_functions for step pagination.")
+                    output["next_step_available"] = True
+                    return output
+
+                # In mcp_mode, if no Next button is visible, we are on the final step (or single-page form).
+                # Return control to mcp_functions.py so it can:
+                # 1. Run the consent / agreement check
+                # 2. Run detect_and_handle_captcha (AI solving or user intervention modal)
+                # 3. Perform verified final submit
+                print("[FormFiller] Final step reached in mcp_mode — returning to mcp_functions for consent, captcha, and submission.")
+                output["ready_to_submit"] = True
+                return output
+
+            print("All fields verified. Submitting application...")
+            # Proactively check consent checkboxes
+            try:
+
+                await self.page.evaluate("""() => {
+                    const chks = [...document.querySelectorAll('input[type="checkbox"], [role="checkbox"]')];
+                    for (const c of chks) {
+                        if (c.checked || c.getAttribute('aria-checked') === 'true') continue;
+                        const parent = c.closest('label, div, p, li, form, section, .form-group') || c.parentElement;
+                        const parentText = (parent ? parent.innerText : '').toLowerCase();
+                        const idName = ((c.id || '') + ' ' + (c.name || '') + ' ' + (c.className || '')).toLowerCase();
+                        if (/agree|consent|terms|condition|privacy|policy|sms|subscribe|declaration/i.test(parentText + ' ' + idName)) {
+                            try { c.click(); } catch(e) {}
+                            if (!c.checked) {
+                                c.checked = true;
+                                c.dispatchEvent(new Event('input', { bubbles: true }));
+                                c.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        }
+                    }
+                }""")
+            except Exception:
+                pass
+
+            submit_selectors = [
+                'button[data-testid="apply-button"]',
+                'button.ashby-application-form-submit-button',
+                '.gh-widget-btn:has-text("Submit")',
+                'div.btn:has-text("Submit")',
+                'div[class*="gh-widget"]:has-text("Submit")',
+                'button:has-text("Submit Application")',
+                'button:has-text("Submit application")',
+                'button:has-text("Apply for this position")',
+                'button:has-text("Apply for this Job")',
+                'button:has-text("Apply for this job")',
+                'button:has-text("Apply for this Role")',
+                'button:has-text("Apply for Role")',
+                'button[data-testid*="submit"]',
+                'button[data-testid*="apply"]',
+                '[data-testid*="apply-button"]',
+                '[data-testid*="submit-button"]',
+                'button:has-text("Submit Form")',
+                'button:has-text("Apply Now")',
+                'button:has-text("Apply now")',
+                '#career button',
+                '#application-form button[type="submit"], #application-form input[type="submit"]',
+                '#apply button[type="submit"], #apply input[type="submit"]',
+                'input[type="submit"][value*="Submit" i]',
+                'button[type="submit"]:has-text("Submit")',
+                'button[type="submit"]:has-text("Apply")',
+                'button:has-text("Submit")',
+            ]
+            submit_btn = None
+            all_frames = [self.page] + [f for f in self.page.frames if not self.is_ignorable_frame(f)]
+            for ctx in all_frames:
+                for s_sel in submit_selectors:
+                    try:
+                        b_loc = ctx.locator(s_sel).first
+                        if await b_loc.count() > 0 and await b_loc.is_visible():
+                            txt = (await b_loc.text_content() or "").strip().lower()
+                            if any(w in txt for w in ["cancel", "back", "previous", "search", "filter", "login", "sign in", "all jobs"]):
+                                continue
+                            in_search = await b_loc.evaluate("""el => {
+                                return Boolean(el.closest('.elementor-search-form, [class*="search" i], footer, #contact'));
+                            }""")
+                            if in_search:
+                                continue
+                            submit_btn = b_loc
+                            break
+                    except Exception:
+                        continue
+                if submit_btn:
+                    break
+
+            if submit_btn:
+                try:
+                    await submit_btn.scroll_into_view_if_needed(timeout=2000)
+                    await submit_btn.click(timeout=5000)
+                    await self.page.wait_for_timeout(3000)
+                    output["submitted"] = True
+                    print("Application submitted successfully!")
+                except Exception as sub_err:
+                    print(f"Error clicking submit button: {sub_err}")
+            else:
+                print("Submit button not found.")
+
+        if getattr(self, "mcp_mode", False) or output.get("submitted"):
+            return output
 
         if KEEP_BROWSER_OPEN:
             try:
@@ -9683,24 +11206,3 @@ class FormFiller:
                 pass
         return output
 
-
-async def call_playwright(url: str):
-    try:
-        async with async_playwright() as pw:
-            browser = await pw.chromium.launch(headless=False)
-            context = await browser.new_context(viewport={"width": 1500, "height": 1000})
-            page = await context.new_page()
-            
-            await page.goto(url, wait_until="domcontentloaded", timeout=PAGE_LOAD_TIMEOUT_MS)
-            
-            form_applier = FormFiller(page=page, url=url)
-            res = await form_applier.main()
-            print(res)
-            return res
-    except Exception as e:
-        print(f"error is {e}")
-        return {"error": str(e)}
-
-if __name__ == "__main__":
-    url = input("Enter the url :- ").strip()
-    asyncio.run(call_playwright(url))

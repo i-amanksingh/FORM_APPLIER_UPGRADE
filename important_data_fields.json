@@ -2,1070 +2,32 @@
     "fields": [
         {
             "element_index": 0,
-            "field_key": "resume",
-            "field_type": "file",
-            "question": "Upload resume * This will auto-fill the fields below. 10MB max file size (Allowed file types are .doc, .pdf, .docx, .rtf, .odt).",
-            "selector": "#resume-upload",
+            "field_key": "first_name",
+            "field_type": "text",
+            "question": "First Name",
+            "selector": "#first_name",
             "frame_index": 0,
-            "required": false,
+            "required": true,
             "selector_verified": true,
             "filled": false,
             "value_verified": false
         },
         {
             "element_index": 1,
-            "field_key": "resume",
-            "field_type": "file",
-            "question": "Upload Resume/CV",
-            "selector": "div#resume-droppable > div:nth-of-type(2) > div > a > input",
+            "field_key": "last_name",
+            "field_type": "text",
+            "question": "Last Name",
+            "selector": "#last_name",
             "frame_index": 0,
-            "required": false,
+            "required": true,
             "selector_verified": true,
             "filled": false,
             "value_verified": false
         },
         {
             "element_index": 2,
-            "field_key": "custom_question",
-            "field_type": "text",
-            "question": "Upload resume",
-            "selector": "#resume",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 3,
-            "field_key": "first_name",
-            "field_type": "text",
-            "question": "First Name",
-            "selector": "#firstName",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 4,
-            "field_key": "middle_name",
-            "field_type": "text",
-            "question": "Middle Name",
-            "selector": "#middleName",
-            "frame_index": 0,
-            "required": false,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 5,
-            "field_key": "last_name",
-            "field_type": "text",
-            "question": "Last Name",
-            "selector": "#lastName",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 6,
-            "field_key": "phone_country_code",
-            "field_type": "select",
-            "question": "Mobile Phone",
-            "selector": "#mobilePhone\\.countryCode",
-            "frame_index": 0,
-            "required": false,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "",
-                    "value": ""
-                },
-                {
-                    "label": "Afghanistan (+93)",
-                    "value": "+93"
-                },
-                {
-                    "label": "Albania (+355)",
-                    "value": "+355"
-                },
-                {
-                    "label": "Algeria (+213)",
-                    "value": "+213"
-                },
-                {
-                    "label": "American Samoa (+1-684)",
-                    "value": "+1-684"
-                },
-                {
-                    "label": "Andorra (+376)",
-                    "value": "+376"
-                },
-                {
-                    "label": "Angola (+244)",
-                    "value": "+244"
-                },
-                {
-                    "label": "Anguilla (+1-264)",
-                    "value": "+1-264"
-                },
-                {
-                    "label": "Antarctica (+672)",
-                    "value": "+672"
-                },
-                {
-                    "label": "Antigua and Barbuda (+1-268)",
-                    "value": "+1-268"
-                },
-                {
-                    "label": "Argentina (+54)",
-                    "value": "+54"
-                },
-                {
-                    "label": "Armenia (+374)",
-                    "value": "+374"
-                },
-                {
-                    "label": "Aruba (+297)",
-                    "value": "+297"
-                },
-                {
-                    "label": "Australia (+61)",
-                    "value": "+61"
-                },
-                {
-                    "label": "Austria (+43)",
-                    "value": "+43"
-                },
-                {
-                    "label": "Azerbaijan (+994)",
-                    "value": "+994"
-                },
-                {
-                    "label": "Bahamas (+1-242)",
-                    "value": "+1-242"
-                },
-                {
-                    "label": "Bahrain (+973)",
-                    "value": "+973"
-                },
-                {
-                    "label": "Bangladesh (+880)",
-                    "value": "+880"
-                },
-                {
-                    "label": "Barbados (+1-246)",
-                    "value": "+1-246"
-                },
-                {
-                    "label": "Belarus (+375)",
-                    "value": "+375"
-                },
-                {
-                    "label": "Belgium (+32)",
-                    "value": "+32"
-                },
-                {
-                    "label": "Belize (+501)",
-                    "value": "+501"
-                },
-                {
-                    "label": "Benin (+229)",
-                    "value": "+229"
-                },
-                {
-                    "label": "Bermuda (+1-441)",
-                    "value": "+1-441"
-                },
-                {
-                    "label": "Bhutan (+975)",
-                    "value": "+975"
-                },
-                {
-                    "label": "Bolivia (+591)",
-                    "value": "+591"
-                },
-                {
-                    "label": "Bosnia and Herzegovina (+387)",
-                    "value": "+387"
-                },
-                {
-                    "label": "Botswana (+267)",
-                    "value": "+267"
-                },
-                {
-                    "label": "Brazil (+55)",
-                    "value": "+55"
-                },
-                {
-                    "label": "British Indian Ocean Territory (+246)",
-                    "value": "+246"
-                },
-                {
-                    "label": "British Virgin Islands (+1-284)",
-                    "value": "+1-284"
-                },
-                {
-                    "label": "Brunei (+673)",
-                    "value": "+673"
-                },
-                {
-                    "label": "Bulgaria (+359)",
-                    "value": "+359"
-                },
-                {
-                    "label": "Burkina Faso (+226)",
-                    "value": "+226"
-                },
-                {
-                    "label": "Burundi (+257)",
-                    "value": "+257"
-                },
-                {
-                    "label": "Cambodia (+855)",
-                    "value": "+855"
-                },
-                {
-                    "label": "Cameroon (+237)",
-                    "value": "+237"
-                },
-                {
-                    "label": "Canada (+1)",
-                    "value": "+1"
-                },
-                {
-                    "label": "Cape Verde (+238)",
-                    "value": "+238"
-                },
-                {
-                    "label": "Cayman Islands (+1-345)",
-                    "value": "+1-345"
-                },
-                {
-                    "label": "Central African Republic (+236)",
-                    "value": "+236"
-                },
-                {
-                    "label": "Chad (+235)",
-                    "value": "+235"
-                },
-                {
-                    "label": "Chile (+56)",
-                    "value": "+56"
-                },
-                {
-                    "label": "China (+86)",
-                    "value": "+86"
-                },
-                {
-                    "label": "Christmas Island (+61)",
-                    "value": "+61"
-                },
-                {
-                    "label": "Cocos Islands (+61)",
-                    "value": "+61"
-                },
-                {
-                    "label": "Colombia (+57)",
-                    "value": "+57"
-                },
-                {
-                    "label": "Comoros (+269)",
-                    "value": "+269"
-                },
-                {
-                    "label": "Cook Islands (+682)",
-                    "value": "+682"
-                },
-                {
-                    "label": "Costa Rica (+506)",
-                    "value": "+506"
-                },
-                {
-                    "label": "Croatia (+385)",
-                    "value": "+385"
-                },
-                {
-                    "label": "Cuba (+53)",
-                    "value": "+53"
-                },
-                {
-                    "label": "Curacao (+599)",
-                    "value": "+599"
-                },
-                {
-                    "label": "Cyprus (+357)",
-                    "value": "+357"
-                },
-                {
-                    "label": "Czech Republic (+420)",
-                    "value": "+420"
-                },
-                {
-                    "label": "Democratic Republic of the Congo (+243)",
-                    "value": "+243"
-                },
-                {
-                    "label": "Denmark (+45)",
-                    "value": "+45"
-                },
-                {
-                    "label": "Djibouti (+253)",
-                    "value": "+253"
-                },
-                {
-                    "label": "Dominica (+1-767)",
-                    "value": "+1-767"
-                },
-                {
-                    "label": "Dominican Republic (+1-809)",
-                    "value": "+1-809"
-                },
-                {
-                    "label": "East Timor (+670)",
-                    "value": "+670"
-                },
-                {
-                    "label": "Ecuador (+593)",
-                    "value": "+593"
-                },
-                {
-                    "label": "Egypt (+20)",
-                    "value": "+20"
-                },
-                {
-                    "label": "El Salvador (+503)",
-                    "value": "+503"
-                },
-                {
-                    "label": "Equatorial Guinea (+240)",
-                    "value": "+240"
-                },
-                {
-                    "label": "Eritrea (+291)",
-                    "value": "+291"
-                },
-                {
-                    "label": "Estonia (+372)",
-                    "value": "+372"
-                },
-                {
-                    "label": "Ethiopia (+251)",
-                    "value": "+251"
-                },
-                {
-                    "label": "Falkland Islands (+500)",
-                    "value": "+500"
-                },
-                {
-                    "label": "Faroe Islands (+298)",
-                    "value": "+298"
-                },
-                {
-                    "label": "Fiji (+679)",
-                    "value": "+679"
-                },
-                {
-                    "label": "Finland (+358)",
-                    "value": "+358"
-                },
-                {
-                    "label": "France (+33)",
-                    "value": "+33"
-                },
-                {
-                    "label": "French Polynesia (+689)",
-                    "value": "+689"
-                },
-                {
-                    "label": "Gabon (+241)",
-                    "value": "+241"
-                },
-                {
-                    "label": "Gambia (+220)",
-                    "value": "+220"
-                },
-                {
-                    "label": "Georgia (+995)",
-                    "value": "+995"
-                },
-                {
-                    "label": "Germany (+49)",
-                    "value": "+49"
-                },
-                {
-                    "label": "Ghana (+233)",
-                    "value": "+233"
-                },
-                {
-                    "label": "Gibraltar (+350)",
-                    "value": "+350"
-                },
-                {
-                    "label": "Greece (+30)",
-                    "value": "+30"
-                },
-                {
-                    "label": "Greenland (+299)",
-                    "value": "+299"
-                },
-                {
-                    "label": "Grenada (+1-473)",
-                    "value": "+1-473"
-                },
-                {
-                    "label": "Guam (+1-671)",
-                    "value": "+1-671"
-                },
-                {
-                    "label": "Guatemala (+502)",
-                    "value": "+502"
-                },
-                {
-                    "label": "Guernsey (+44-1481)",
-                    "value": "+44-1481"
-                },
-                {
-                    "label": "Guinea (+224)",
-                    "value": "+224"
-                },
-                {
-                    "label": "Guinea-Bissau (+245)",
-                    "value": "+245"
-                },
-                {
-                    "label": "Guyana (+592)",
-                    "value": "+592"
-                },
-                {
-                    "label": "Haiti (+509)",
-                    "value": "+509"
-                },
-                {
-                    "label": "Honduras (+504)",
-                    "value": "+504"
-                },
-                {
-                    "label": "Hong Kong (+852)",
-                    "value": "+852"
-                },
-                {
-                    "label": "Hungary (+36)",
-                    "value": "+36"
-                },
-                {
-                    "label": "Iceland (+354)",
-                    "value": "+354"
-                },
-                {
-                    "label": "India (+91)",
-                    "value": "+91"
-                },
-                {
-                    "label": "Indonesia (+62)",
-                    "value": "+62"
-                },
-                {
-                    "label": "Iran (+98)",
-                    "value": "+98"
-                },
-                {
-                    "label": "Iraq (+964)",
-                    "value": "+964"
-                },
-                {
-                    "label": "Ireland (+353)",
-                    "value": "+353"
-                },
-                {
-                    "label": "Isle of Man (+44-1624)",
-                    "value": "+44-1624"
-                },
-                {
-                    "label": "Israel (+972)",
-                    "value": "+972"
-                },
-                {
-                    "label": "Italy (+39)",
-                    "value": "+39"
-                },
-                {
-                    "label": "Ivory Coast (+225)",
-                    "value": "+225"
-                },
-                {
-                    "label": "Jamaica (+1-876)",
-                    "value": "+1-876"
-                },
-                {
-                    "label": "Japan (+81)",
-                    "value": "+81"
-                },
-                {
-                    "label": "Jersey (+44-1534)",
-                    "value": "+44-1534"
-                },
-                {
-                    "label": "Jordan (+962)",
-                    "value": "+962"
-                },
-                {
-                    "label": "Kazakhstan (+7)",
-                    "value": "+7"
-                },
-                {
-                    "label": "Kenya (+254)",
-                    "value": "+254"
-                },
-                {
-                    "label": "Kiribati (+686)",
-                    "value": "+686"
-                },
-                {
-                    "label": "Kosovo (+383)",
-                    "value": "+383"
-                },
-                {
-                    "label": "Kuwait (+965)",
-                    "value": "+965"
-                },
-                {
-                    "label": "Kyrgyzstan (+996)",
-                    "value": "+996"
-                },
-                {
-                    "label": "Laos (+856)",
-                    "value": "+856"
-                },
-                {
-                    "label": "Latvia (+371)",
-                    "value": "+371"
-                },
-                {
-                    "label": "Lebanon (+961)",
-                    "value": "+961"
-                },
-                {
-                    "label": "Lesotho (+266)",
-                    "value": "+266"
-                },
-                {
-                    "label": "Liberia (+231)",
-                    "value": "+231"
-                },
-                {
-                    "label": "Libya (+218)",
-                    "value": "+218"
-                },
-                {
-                    "label": "Liechtenstein (+423)",
-                    "value": "+423"
-                },
-                {
-                    "label": "Lithuania (+370)",
-                    "value": "+370"
-                },
-                {
-                    "label": "Luxembourg (+352)",
-                    "value": "+352"
-                },
-                {
-                    "label": "Macau (+853)",
-                    "value": "+853"
-                },
-                {
-                    "label": "Macedonia (+389)",
-                    "value": "+389"
-                },
-                {
-                    "label": "Madagascar (+261)",
-                    "value": "+261"
-                },
-                {
-                    "label": "Malawi (+265)",
-                    "value": "+265"
-                },
-                {
-                    "label": "Malaysia (+60)",
-                    "value": "+60"
-                },
-                {
-                    "label": "Maldives (+960)",
-                    "value": "+960"
-                },
-                {
-                    "label": "Mali (+223)",
-                    "value": "+223"
-                },
-                {
-                    "label": "Malta (+356)",
-                    "value": "+356"
-                },
-                {
-                    "label": "Marshall Islands (+692)",
-                    "value": "+692"
-                },
-                {
-                    "label": "Mauritania (+222)",
-                    "value": "+222"
-                },
-                {
-                    "label": "Mauritius (+230)",
-                    "value": "+230"
-                },
-                {
-                    "label": "Mayotte (+262)",
-                    "value": "+262"
-                },
-                {
-                    "label": "Mexico (+52)",
-                    "value": "+52"
-                },
-                {
-                    "label": "Micronesia (+691)",
-                    "value": "+691"
-                },
-                {
-                    "label": "Moldova (+373)",
-                    "value": "+373"
-                },
-                {
-                    "label": "Monaco (+377)",
-                    "value": "+377"
-                },
-                {
-                    "label": "Mongolia (+976)",
-                    "value": "+976"
-                },
-                {
-                    "label": "Montenegro (+382)",
-                    "value": "+382"
-                },
-                {
-                    "label": "Montserrat (+1-664)",
-                    "value": "+1-664"
-                },
-                {
-                    "label": "Morocco (+212)",
-                    "value": "+212"
-                },
-                {
-                    "label": "Mozambique (+258)",
-                    "value": "+258"
-                },
-                {
-                    "label": "Myanmar (+95)",
-                    "value": "+95"
-                },
-                {
-                    "label": "Namibia (+264)",
-                    "value": "+264"
-                },
-                {
-                    "label": "Nauru (+674)",
-                    "value": "+674"
-                },
-                {
-                    "label": "Nepal (+977)",
-                    "value": "+977"
-                },
-                {
-                    "label": "Netherlands (+31)",
-                    "value": "+31"
-                },
-                {
-                    "label": "Netherlands Antilles (+599)",
-                    "value": "+599"
-                },
-                {
-                    "label": "New Caledonia (+687)",
-                    "value": "+687"
-                },
-                {
-                    "label": "New Zealand (+64)",
-                    "value": "+64"
-                },
-                {
-                    "label": "Nicaragua (+505)",
-                    "value": "+505"
-                },
-                {
-                    "label": "Niger (+227)",
-                    "value": "+227"
-                },
-                {
-                    "label": "Nigeria (+234)",
-                    "value": "+234"
-                },
-                {
-                    "label": "Niue (+683)",
-                    "value": "+683"
-                },
-                {
-                    "label": "North Korea (+850)",
-                    "value": "+850"
-                },
-                {
-                    "label": "Northern Mariana Islands (+1-670)",
-                    "value": "+1-670"
-                },
-                {
-                    "label": "Norway (+47)",
-                    "value": "+47"
-                },
-                {
-                    "label": "Oman (+968)",
-                    "value": "+968"
-                },
-                {
-                    "label": "Pakistan (+92)",
-                    "value": "+92"
-                },
-                {
-                    "label": "Palau (+680)",
-                    "value": "+680"
-                },
-                {
-                    "label": "Palestine (+970)",
-                    "value": "+970"
-                },
-                {
-                    "label": "Panama (+507)",
-                    "value": "+507"
-                },
-                {
-                    "label": "Papua New Guinea (+675)",
-                    "value": "+675"
-                },
-                {
-                    "label": "Paraguay (+595)",
-                    "value": "+595"
-                },
-                {
-                    "label": "Peru (+51)",
-                    "value": "+51"
-                },
-                {
-                    "label": "Philippines (+63)",
-                    "value": "+63"
-                },
-                {
-                    "label": "Pitcairn (+64)",
-                    "value": "+64"
-                },
-                {
-                    "label": "Poland (+48)",
-                    "value": "+48"
-                },
-                {
-                    "label": "Portugal (+351)",
-                    "value": "+351"
-                },
-                {
-                    "label": "Puerto Rico (+1-787, 1-939)",
-                    "value": "+1-787, 1-939"
-                },
-                {
-                    "label": "Qatar (+974)",
-                    "value": "+974"
-                },
-                {
-                    "label": "Republic of the Congo (+242)",
-                    "value": "+242"
-                },
-                {
-                    "label": "Reunion (+262)",
-                    "value": "+262"
-                },
-                {
-                    "label": "Romania (+40)",
-                    "value": "+40"
-                },
-                {
-                    "label": "Russia (+7)",
-                    "value": "+7"
-                },
-                {
-                    "label": "Rwanda (+250)",
-                    "value": "+250"
-                },
-                {
-                    "label": "Saint Barthelemy (+590)",
-                    "value": "+590"
-                },
-                {
-                    "label": "Saint Helena (+290)",
-                    "value": "+290"
-                },
-                {
-                    "label": "Saint Kitts and Nevis (+1-869)",
-                    "value": "+1-869"
-                },
-                {
-                    "label": "Saint Lucia (+1-758)",
-                    "value": "+1-758"
-                },
-                {
-                    "label": "Saint Martin (+590)",
-                    "value": "+590"
-                },
-                {
-                    "label": "Saint Pierre and Miquelon (+508)",
-                    "value": "+508"
-                },
-                {
-                    "label": "Saint Vincent and the Grenadines (+1-784)",
-                    "value": "+1-784"
-                },
-                {
-                    "label": "Samoa (+685)",
-                    "value": "+685"
-                },
-                {
-                    "label": "San Marino (+378)",
-                    "value": "+378"
-                },
-                {
-                    "label": "Sao Tome and Principe (+239)",
-                    "value": "+239"
-                },
-                {
-                    "label": "Saudi Arabia (+966)",
-                    "value": "+966"
-                },
-                {
-                    "label": "Senegal (+221)",
-                    "value": "+221"
-                },
-                {
-                    "label": "Serbia (+381)",
-                    "value": "+381"
-                },
-                {
-                    "label": "Seychelles (+248)",
-                    "value": "+248"
-                },
-                {
-                    "label": "Sierra Leone (+232)",
-                    "value": "+232"
-                },
-                {
-                    "label": "Singapore (+65)",
-                    "value": "+65"
-                },
-                {
-                    "label": "Sint Maarten (+1-721)",
-                    "value": "+1-721"
-                },
-                {
-                    "label": "Slovakia (+421)",
-                    "value": "+421"
-                },
-                {
-                    "label": "Slovenia (+386)",
-                    "value": "+386"
-                },
-                {
-                    "label": "Solomon Islands (+677)",
-                    "value": "+677"
-                },
-                {
-                    "label": "Somalia (+252)",
-                    "value": "+252"
-                },
-                {
-                    "label": "South Africa (+27)",
-                    "value": "+27"
-                },
-                {
-                    "label": "South Korea (+82)",
-                    "value": "+82"
-                },
-                {
-                    "label": "South Sudan (+211)",
-                    "value": "+211"
-                },
-                {
-                    "label": "Spain (+34)",
-                    "value": "+34"
-                },
-                {
-                    "label": "Sri Lanka (+94)",
-                    "value": "+94"
-                },
-                {
-                    "label": "Sudan (+249)",
-                    "value": "+249"
-                },
-                {
-                    "label": "Suriname (+597)",
-                    "value": "+597"
-                },
-                {
-                    "label": "Svalbard and Jan Mayen (+47)",
-                    "value": "+47"
-                },
-                {
-                    "label": "Swaziland (+268)",
-                    "value": "+268"
-                },
-                {
-                    "label": "Sweden (+46)",
-                    "value": "+46"
-                },
-                {
-                    "label": "Switzerland (+41)",
-                    "value": "+41"
-                },
-                {
-                    "label": "Syria (+963)",
-                    "value": "+963"
-                },
-                {
-                    "label": "Taiwan (+886)",
-                    "value": "+886"
-                },
-                {
-                    "label": "Tajikistan (+992)",
-                    "value": "+992"
-                },
-                {
-                    "label": "Tanzania (+255)",
-                    "value": "+255"
-                },
-                {
-                    "label": "Thailand (+66)",
-                    "value": "+66"
-                },
-                {
-                    "label": "Togo (+228)",
-                    "value": "+228"
-                },
-                {
-                    "label": "Tokelau (+690)",
-                    "value": "+690"
-                },
-                {
-                    "label": "Tonga (+676)",
-                    "value": "+676"
-                },
-                {
-                    "label": "Trinidad and Tobago (+1-868)",
-                    "value": "+1-868"
-                },
-                {
-                    "label": "Tunisia (+216)",
-                    "value": "+216"
-                },
-                {
-                    "label": "Turkey (+90)",
-                    "value": "+90"
-                },
-                {
-                    "label": "Turkmenistan (+993)",
-                    "value": "+993"
-                },
-                {
-                    "label": "Turks and Caicos Islands (+1-649)",
-                    "value": "+1-649"
-                },
-                {
-                    "label": "Tuvalu (+688)",
-                    "value": "+688"
-                },
-                {
-                    "label": "U.S. Virgin Islands (+1-340)",
-                    "value": "+1-340"
-                },
-                {
-                    "label": "Uganda (+256)",
-                    "value": "+256"
-                },
-                {
-                    "label": "Ukraine (+380)",
-                    "value": "+380"
-                },
-                {
-                    "label": "United Arab Emirates (+971)",
-                    "value": "+971"
-                },
-                {
-                    "label": "United Kingdom (+44)",
-                    "value": "+44"
-                },
-                {
-                    "label": "United States (+1)",
-                    "value": "+1"
-                },
-                {
-                    "label": "Uruguay (+598)",
-                    "value": "+598"
-                },
-                {
-                    "label": "Uzbekistan (+998)",
-                    "value": "+998"
-                },
-                {
-                    "label": "Vanuatu (+678)",
-                    "value": "+678"
-                },
-                {
-                    "label": "Vatican (+379)",
-                    "value": "+379"
-                },
-                {
-                    "label": "Venezuela (+58)",
-                    "value": "+58"
-                },
-                {
-                    "label": "Vietnam (+84)",
-                    "value": "+84"
-                },
-                {
-                    "label": "Wallis and Futuna (+681)",
-                    "value": "+681"
-                },
-                {
-                    "label": "Western Sahara (+212)",
-                    "value": "+212"
-                },
-                {
-                    "label": "Yemen (+967)",
-                    "value": "+967"
-                },
-                {
-                    "label": "Zambia (+260)",
-                    "value": "+260"
-                },
-                {
-                    "label": "Zimbabwe (+263)",
-                    "value": "+263"
-                }
-            ]
-        },
-        {
-            "element_index": 7,
-            "field_key": "phone",
-            "field_type": "text",
-            "question": "Mobile Phone",
-            "selector": "#mobilePhone\\.number",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 8,
             "field_key": "email",
-            "field_type": "email",
+            "field_type": "text",
             "question": "Email",
             "selector": "#email",
             "frame_index": 0,
@@ -1075,11 +37,11 @@
             "value_verified": false
         },
         {
-            "element_index": 9,
-            "field_key": "gender",
-            "field_type": "select",
-            "question": "Gender * Select an option Male Female Non-binary Don't want to disclose Transgender",
-            "selector": "#gender",
+            "element_index": 3,
+            "field_key": "phone_country_code",
+            "field_type": "combobox",
+            "question": "Country",
+            "selector": "#country",
             "frame_index": 0,
             "required": true,
             "selector_verified": true,
@@ -1087,50 +49,1369 @@
             "value_verified": false,
             "options": [
                 {
-                    "label": "Select an option",
-                    "value": ""
+                    "label": "United States +1",
+                    "value": "United States +1",
+                    "selector": "#react-select-country-option-0"
                 },
                 {
-                    "label": "Male",
-                    "value": "1"
+                    "label": "Afghanistan +93",
+                    "value": "Afghanistan +93",
+                    "selector": "#react-select-country-option-1"
                 },
                 {
-                    "label": "Female",
-                    "value": "2"
+                    "label": "Åland Islands +358",
+                    "value": "Åland Islands +358",
+                    "selector": "#react-select-country-option-2"
                 },
                 {
-                    "label": "Non-binary",
-                    "value": "3"
+                    "label": "Albania +355",
+                    "value": "Albania +355",
+                    "selector": "#react-select-country-option-3"
                 },
                 {
-                    "label": "Don't want to disclose",
-                    "value": "4"
+                    "label": "Algeria +213",
+                    "value": "Algeria +213",
+                    "selector": "#react-select-country-option-4"
                 },
                 {
-                    "label": "Transgender",
-                    "value": "5"
+                    "label": "American Samoa +1",
+                    "value": "American Samoa +1",
+                    "selector": "#react-select-country-option-5"
+                },
+                {
+                    "label": "Andorra +376",
+                    "value": "Andorra +376",
+                    "selector": "#react-select-country-option-6"
+                },
+                {
+                    "label": "Angola +244",
+                    "value": "Angola +244",
+                    "selector": "#react-select-country-option-7"
+                },
+                {
+                    "label": "Anguilla +1",
+                    "value": "Anguilla +1",
+                    "selector": "#react-select-country-option-8"
+                },
+                {
+                    "label": "Antigua & Barbuda +1",
+                    "value": "Antigua & Barbuda +1",
+                    "selector": "#react-select-country-option-9"
+                },
+                {
+                    "label": "Argentina +54",
+                    "value": "Argentina +54",
+                    "selector": "#react-select-country-option-10"
+                },
+                {
+                    "label": "Armenia +374",
+                    "value": "Armenia +374",
+                    "selector": "#react-select-country-option-11"
+                },
+                {
+                    "label": "Aruba +297",
+                    "value": "Aruba +297",
+                    "selector": "#react-select-country-option-12"
+                },
+                {
+                    "label": "Ascension Island +247",
+                    "value": "Ascension Island +247",
+                    "selector": "#react-select-country-option-13"
+                },
+                {
+                    "label": "Australia +61",
+                    "value": "Australia +61",
+                    "selector": "#react-select-country-option-14"
+                },
+                {
+                    "label": "Austria +43",
+                    "value": "Austria +43",
+                    "selector": "#react-select-country-option-15"
+                },
+                {
+                    "label": "Azerbaijan +994",
+                    "value": "Azerbaijan +994",
+                    "selector": "#react-select-country-option-16"
+                },
+                {
+                    "label": "Bahamas +1",
+                    "value": "Bahamas +1",
+                    "selector": "#react-select-country-option-17"
+                },
+                {
+                    "label": "Bahrain +973",
+                    "value": "Bahrain +973",
+                    "selector": "#react-select-country-option-18"
+                },
+                {
+                    "label": "Bangladesh +880",
+                    "value": "Bangladesh +880",
+                    "selector": "#react-select-country-option-19"
+                },
+                {
+                    "label": "Barbados +1",
+                    "value": "Barbados +1",
+                    "selector": "#react-select-country-option-20"
+                },
+                {
+                    "label": "Belarus +375",
+                    "value": "Belarus +375",
+                    "selector": "#react-select-country-option-21"
+                },
+                {
+                    "label": "Belgium +32",
+                    "value": "Belgium +32",
+                    "selector": "#react-select-country-option-22"
+                },
+                {
+                    "label": "Belize +501",
+                    "value": "Belize +501",
+                    "selector": "#react-select-country-option-23"
+                },
+                {
+                    "label": "Benin +229",
+                    "value": "Benin +229",
+                    "selector": "#react-select-country-option-24"
+                },
+                {
+                    "label": "Bermuda +1",
+                    "value": "Bermuda +1",
+                    "selector": "#react-select-country-option-25"
+                },
+                {
+                    "label": "Bhutan +975",
+                    "value": "Bhutan +975",
+                    "selector": "#react-select-country-option-26"
+                },
+                {
+                    "label": "Bolivia +591",
+                    "value": "Bolivia +591",
+                    "selector": "#react-select-country-option-27"
+                },
+                {
+                    "label": "Bosnia & Herzegovina +387",
+                    "value": "Bosnia & Herzegovina +387",
+                    "selector": "#react-select-country-option-28"
+                },
+                {
+                    "label": "Botswana +267",
+                    "value": "Botswana +267",
+                    "selector": "#react-select-country-option-29"
+                },
+                {
+                    "label": "Brazil +55",
+                    "value": "Brazil +55",
+                    "selector": "#react-select-country-option-30"
+                },
+                {
+                    "label": "British Indian Ocean Territory +246",
+                    "value": "British Indian Ocean Territory +246",
+                    "selector": "#react-select-country-option-31"
+                },
+                {
+                    "label": "British Virgin Islands +1",
+                    "value": "British Virgin Islands +1",
+                    "selector": "#react-select-country-option-32"
+                },
+                {
+                    "label": "Brunei +673",
+                    "value": "Brunei +673",
+                    "selector": "#react-select-country-option-33"
+                },
+                {
+                    "label": "Bulgaria +359",
+                    "value": "Bulgaria +359",
+                    "selector": "#react-select-country-option-34"
+                },
+                {
+                    "label": "Burkina Faso +226",
+                    "value": "Burkina Faso +226",
+                    "selector": "#react-select-country-option-35"
+                },
+                {
+                    "label": "Burundi +257",
+                    "value": "Burundi +257",
+                    "selector": "#react-select-country-option-36"
+                },
+                {
+                    "label": "Cambodia +855",
+                    "value": "Cambodia +855",
+                    "selector": "#react-select-country-option-37"
+                },
+                {
+                    "label": "Cameroon +237",
+                    "value": "Cameroon +237",
+                    "selector": "#react-select-country-option-38"
+                },
+                {
+                    "label": "Canada +1",
+                    "value": "Canada +1",
+                    "selector": "#react-select-country-option-39"
+                },
+                {
+                    "label": "Cape Verde +238",
+                    "value": "Cape Verde +238",
+                    "selector": "#react-select-country-option-40"
+                },
+                {
+                    "label": "Caribbean Netherlands +599",
+                    "value": "Caribbean Netherlands +599",
+                    "selector": "#react-select-country-option-41"
+                },
+                {
+                    "label": "Cayman Islands +1",
+                    "value": "Cayman Islands +1",
+                    "selector": "#react-select-country-option-42"
+                },
+                {
+                    "label": "Central African Republic +236",
+                    "value": "Central African Republic +236",
+                    "selector": "#react-select-country-option-43"
+                },
+                {
+                    "label": "Chad +235",
+                    "value": "Chad +235",
+                    "selector": "#react-select-country-option-44"
+                },
+                {
+                    "label": "Chile +56",
+                    "value": "Chile +56",
+                    "selector": "#react-select-country-option-45"
+                },
+                {
+                    "label": "China +86",
+                    "value": "China +86",
+                    "selector": "#react-select-country-option-46"
+                },
+                {
+                    "label": "Christmas Island +61",
+                    "value": "Christmas Island +61",
+                    "selector": "#react-select-country-option-47"
+                },
+                {
+                    "label": "Cocos (Keeling) Islands +61",
+                    "value": "Cocos (Keeling) Islands +61",
+                    "selector": "#react-select-country-option-48"
+                },
+                {
+                    "label": "Colombia +57",
+                    "value": "Colombia +57",
+                    "selector": "#react-select-country-option-49"
+                },
+                {
+                    "label": "Comoros +269",
+                    "value": "Comoros +269",
+                    "selector": "#react-select-country-option-50"
+                },
+                {
+                    "label": "Congo - Brazzaville +242",
+                    "value": "Congo - Brazzaville +242",
+                    "selector": "#react-select-country-option-51"
+                },
+                {
+                    "label": "Congo - Kinshasa +243",
+                    "value": "Congo - Kinshasa +243",
+                    "selector": "#react-select-country-option-52"
+                },
+                {
+                    "label": "Cook Islands +682",
+                    "value": "Cook Islands +682",
+                    "selector": "#react-select-country-option-53"
+                },
+                {
+                    "label": "Costa Rica +506",
+                    "value": "Costa Rica +506",
+                    "selector": "#react-select-country-option-54"
+                },
+                {
+                    "label": "Côte d’Ivoire +225",
+                    "value": "Côte d’Ivoire +225",
+                    "selector": "#react-select-country-option-55"
+                },
+                {
+                    "label": "Croatia +385",
+                    "value": "Croatia +385",
+                    "selector": "#react-select-country-option-56"
+                },
+                {
+                    "label": "Cuba +53",
+                    "value": "Cuba +53",
+                    "selector": "#react-select-country-option-57"
+                },
+                {
+                    "label": "Curaçao +599",
+                    "value": "Curaçao +599",
+                    "selector": "#react-select-country-option-58"
+                },
+                {
+                    "label": "Cyprus +357",
+                    "value": "Cyprus +357",
+                    "selector": "#react-select-country-option-59"
+                },
+                {
+                    "label": "Czechia +420",
+                    "value": "Czechia +420",
+                    "selector": "#react-select-country-option-60"
+                },
+                {
+                    "label": "Denmark +45",
+                    "value": "Denmark +45",
+                    "selector": "#react-select-country-option-61"
+                },
+                {
+                    "label": "Djibouti +253",
+                    "value": "Djibouti +253",
+                    "selector": "#react-select-country-option-62"
+                },
+                {
+                    "label": "Dominica +1",
+                    "value": "Dominica +1",
+                    "selector": "#react-select-country-option-63"
+                },
+                {
+                    "label": "Dominican Republic +1",
+                    "value": "Dominican Republic +1",
+                    "selector": "#react-select-country-option-64"
+                },
+                {
+                    "label": "Ecuador +593",
+                    "value": "Ecuador +593",
+                    "selector": "#react-select-country-option-65"
+                },
+                {
+                    "label": "Egypt +20",
+                    "value": "Egypt +20",
+                    "selector": "#react-select-country-option-66"
+                },
+                {
+                    "label": "El Salvador +503",
+                    "value": "El Salvador +503",
+                    "selector": "#react-select-country-option-67"
+                },
+                {
+                    "label": "Equatorial Guinea +240",
+                    "value": "Equatorial Guinea +240",
+                    "selector": "#react-select-country-option-68"
+                },
+                {
+                    "label": "Eritrea +291",
+                    "value": "Eritrea +291",
+                    "selector": "#react-select-country-option-69"
+                },
+                {
+                    "label": "Estonia +372",
+                    "value": "Estonia +372",
+                    "selector": "#react-select-country-option-70"
+                },
+                {
+                    "label": "Eswatini +268",
+                    "value": "Eswatini +268",
+                    "selector": "#react-select-country-option-71"
+                },
+                {
+                    "label": "Ethiopia +251",
+                    "value": "Ethiopia +251",
+                    "selector": "#react-select-country-option-72"
+                },
+                {
+                    "label": "Falkland Islands +500",
+                    "value": "Falkland Islands +500",
+                    "selector": "#react-select-country-option-73"
+                },
+                {
+                    "label": "Faroe Islands +298",
+                    "value": "Faroe Islands +298",
+                    "selector": "#react-select-country-option-74"
+                },
+                {
+                    "label": "Fiji +679",
+                    "value": "Fiji +679",
+                    "selector": "#react-select-country-option-75"
+                },
+                {
+                    "label": "Finland +358",
+                    "value": "Finland +358",
+                    "selector": "#react-select-country-option-76"
+                },
+                {
+                    "label": "France +33",
+                    "value": "France +33",
+                    "selector": "#react-select-country-option-77"
+                },
+                {
+                    "label": "French Guiana +594",
+                    "value": "French Guiana +594",
+                    "selector": "#react-select-country-option-78"
+                },
+                {
+                    "label": "French Polynesia +689",
+                    "value": "French Polynesia +689",
+                    "selector": "#react-select-country-option-79"
+                },
+                {
+                    "label": "Gabon +241",
+                    "value": "Gabon +241",
+                    "selector": "#react-select-country-option-80"
+                },
+                {
+                    "label": "Gambia +220",
+                    "value": "Gambia +220",
+                    "selector": "#react-select-country-option-81"
+                },
+                {
+                    "label": "Georgia +995",
+                    "value": "Georgia +995",
+                    "selector": "#react-select-country-option-82"
+                },
+                {
+                    "label": "Germany +49",
+                    "value": "Germany +49",
+                    "selector": "#react-select-country-option-83"
+                },
+                {
+                    "label": "Ghana +233",
+                    "value": "Ghana +233",
+                    "selector": "#react-select-country-option-84"
+                },
+                {
+                    "label": "Gibraltar +350",
+                    "value": "Gibraltar +350",
+                    "selector": "#react-select-country-option-85"
+                },
+                {
+                    "label": "Greece +30",
+                    "value": "Greece +30",
+                    "selector": "#react-select-country-option-86"
+                },
+                {
+                    "label": "Greenland +299",
+                    "value": "Greenland +299",
+                    "selector": "#react-select-country-option-87"
+                },
+                {
+                    "label": "Grenada +1",
+                    "value": "Grenada +1",
+                    "selector": "#react-select-country-option-88"
+                },
+                {
+                    "label": "Guadeloupe +590",
+                    "value": "Guadeloupe +590",
+                    "selector": "#react-select-country-option-89"
+                },
+                {
+                    "label": "Guam +1",
+                    "value": "Guam +1",
+                    "selector": "#react-select-country-option-90"
+                },
+                {
+                    "label": "Guatemala +502",
+                    "value": "Guatemala +502",
+                    "selector": "#react-select-country-option-91"
+                },
+                {
+                    "label": "Guernsey +44",
+                    "value": "Guernsey +44",
+                    "selector": "#react-select-country-option-92"
+                },
+                {
+                    "label": "Guinea +224",
+                    "value": "Guinea +224",
+                    "selector": "#react-select-country-option-93"
+                },
+                {
+                    "label": "Guinea-Bissau +245",
+                    "value": "Guinea-Bissau +245",
+                    "selector": "#react-select-country-option-94"
+                },
+                {
+                    "label": "Guyana +592",
+                    "value": "Guyana +592",
+                    "selector": "#react-select-country-option-95"
+                },
+                {
+                    "label": "Haiti +509",
+                    "value": "Haiti +509",
+                    "selector": "#react-select-country-option-96"
+                },
+                {
+                    "label": "Honduras +504",
+                    "value": "Honduras +504",
+                    "selector": "#react-select-country-option-97"
+                },
+                {
+                    "label": "Hong Kong SAR China +852",
+                    "value": "Hong Kong SAR China +852",
+                    "selector": "#react-select-country-option-98"
+                },
+                {
+                    "label": "Hungary +36",
+                    "value": "Hungary +36",
+                    "selector": "#react-select-country-option-99"
+                },
+                {
+                    "label": "Iceland +354",
+                    "value": "Iceland +354",
+                    "selector": "#react-select-country-option-100"
+                },
+                {
+                    "label": "India +91",
+                    "value": "India +91",
+                    "selector": "#react-select-country-option-101"
+                },
+                {
+                    "label": "Indonesia +62",
+                    "value": "Indonesia +62",
+                    "selector": "#react-select-country-option-102"
+                },
+                {
+                    "label": "Iran +98",
+                    "value": "Iran +98",
+                    "selector": "#react-select-country-option-103"
+                },
+                {
+                    "label": "Iraq +964",
+                    "value": "Iraq +964",
+                    "selector": "#react-select-country-option-104"
+                },
+                {
+                    "label": "Ireland +353",
+                    "value": "Ireland +353",
+                    "selector": "#react-select-country-option-105"
+                },
+                {
+                    "label": "Isle of Man +44",
+                    "value": "Isle of Man +44",
+                    "selector": "#react-select-country-option-106"
+                },
+                {
+                    "label": "Israel +972",
+                    "value": "Israel +972",
+                    "selector": "#react-select-country-option-107"
+                },
+                {
+                    "label": "Italy +39",
+                    "value": "Italy +39",
+                    "selector": "#react-select-country-option-108"
+                },
+                {
+                    "label": "Jamaica +1",
+                    "value": "Jamaica +1",
+                    "selector": "#react-select-country-option-109"
+                },
+                {
+                    "label": "Japan +81",
+                    "value": "Japan +81",
+                    "selector": "#react-select-country-option-110"
+                },
+                {
+                    "label": "Jersey +44",
+                    "value": "Jersey +44",
+                    "selector": "#react-select-country-option-111"
+                },
+                {
+                    "label": "Jordan +962",
+                    "value": "Jordan +962",
+                    "selector": "#react-select-country-option-112"
+                },
+                {
+                    "label": "Kazakhstan +7",
+                    "value": "Kazakhstan +7",
+                    "selector": "#react-select-country-option-113"
+                },
+                {
+                    "label": "Kenya +254",
+                    "value": "Kenya +254",
+                    "selector": "#react-select-country-option-114"
+                },
+                {
+                    "label": "Kiribati +686",
+                    "value": "Kiribati +686",
+                    "selector": "#react-select-country-option-115"
+                },
+                {
+                    "label": "Kosovo +383",
+                    "value": "Kosovo +383",
+                    "selector": "#react-select-country-option-116"
+                },
+                {
+                    "label": "Kuwait +965",
+                    "value": "Kuwait +965",
+                    "selector": "#react-select-country-option-117"
+                },
+                {
+                    "label": "Kyrgyzstan +996",
+                    "value": "Kyrgyzstan +996",
+                    "selector": "#react-select-country-option-118"
+                },
+                {
+                    "label": "Laos +856",
+                    "value": "Laos +856",
+                    "selector": "#react-select-country-option-119"
+                },
+                {
+                    "label": "Latvia +371",
+                    "value": "Latvia +371",
+                    "selector": "#react-select-country-option-120"
+                },
+                {
+                    "label": "Lebanon +961",
+                    "value": "Lebanon +961",
+                    "selector": "#react-select-country-option-121"
+                },
+                {
+                    "label": "Lesotho +266",
+                    "value": "Lesotho +266",
+                    "selector": "#react-select-country-option-122"
+                },
+                {
+                    "label": "Liberia +231",
+                    "value": "Liberia +231",
+                    "selector": "#react-select-country-option-123"
+                },
+                {
+                    "label": "Libya +218",
+                    "value": "Libya +218",
+                    "selector": "#react-select-country-option-124"
+                },
+                {
+                    "label": "Liechtenstein +423",
+                    "value": "Liechtenstein +423",
+                    "selector": "#react-select-country-option-125"
+                },
+                {
+                    "label": "Lithuania +370",
+                    "value": "Lithuania +370",
+                    "selector": "#react-select-country-option-126"
+                },
+                {
+                    "label": "Luxembourg +352",
+                    "value": "Luxembourg +352",
+                    "selector": "#react-select-country-option-127"
+                },
+                {
+                    "label": "Macao SAR China +853",
+                    "value": "Macao SAR China +853",
+                    "selector": "#react-select-country-option-128"
+                },
+                {
+                    "label": "Madagascar +261",
+                    "value": "Madagascar +261",
+                    "selector": "#react-select-country-option-129"
+                },
+                {
+                    "label": "Malawi +265",
+                    "value": "Malawi +265",
+                    "selector": "#react-select-country-option-130"
+                },
+                {
+                    "label": "Malaysia +60",
+                    "value": "Malaysia +60",
+                    "selector": "#react-select-country-option-131"
+                },
+                {
+                    "label": "Maldives +960",
+                    "value": "Maldives +960",
+                    "selector": "#react-select-country-option-132"
+                },
+                {
+                    "label": "Mali +223",
+                    "value": "Mali +223",
+                    "selector": "#react-select-country-option-133"
+                },
+                {
+                    "label": "Malta +356",
+                    "value": "Malta +356",
+                    "selector": "#react-select-country-option-134"
+                },
+                {
+                    "label": "Marshall Islands +692",
+                    "value": "Marshall Islands +692",
+                    "selector": "#react-select-country-option-135"
+                },
+                {
+                    "label": "Martinique +596",
+                    "value": "Martinique +596",
+                    "selector": "#react-select-country-option-136"
+                },
+                {
+                    "label": "Mauritania +222",
+                    "value": "Mauritania +222",
+                    "selector": "#react-select-country-option-137"
+                },
+                {
+                    "label": "Mauritius +230",
+                    "value": "Mauritius +230",
+                    "selector": "#react-select-country-option-138"
+                },
+                {
+                    "label": "Mayotte +262",
+                    "value": "Mayotte +262",
+                    "selector": "#react-select-country-option-139"
+                },
+                {
+                    "label": "Mexico +52",
+                    "value": "Mexico +52",
+                    "selector": "#react-select-country-option-140"
+                },
+                {
+                    "label": "Micronesia +691",
+                    "value": "Micronesia +691",
+                    "selector": "#react-select-country-option-141"
+                },
+                {
+                    "label": "Moldova +373",
+                    "value": "Moldova +373",
+                    "selector": "#react-select-country-option-142"
+                },
+                {
+                    "label": "Monaco +377",
+                    "value": "Monaco +377",
+                    "selector": "#react-select-country-option-143"
+                },
+                {
+                    "label": "Mongolia +976",
+                    "value": "Mongolia +976",
+                    "selector": "#react-select-country-option-144"
+                },
+                {
+                    "label": "Montenegro +382",
+                    "value": "Montenegro +382",
+                    "selector": "#react-select-country-option-145"
+                },
+                {
+                    "label": "Montserrat +1",
+                    "value": "Montserrat +1",
+                    "selector": "#react-select-country-option-146"
+                },
+                {
+                    "label": "Morocco +212",
+                    "value": "Morocco +212",
+                    "selector": "#react-select-country-option-147"
+                },
+                {
+                    "label": "Mozambique +258",
+                    "value": "Mozambique +258",
+                    "selector": "#react-select-country-option-148"
+                },
+                {
+                    "label": "Myanmar (Burma) +95",
+                    "value": "Myanmar (Burma) +95",
+                    "selector": "#react-select-country-option-149"
+                },
+                {
+                    "label": "Namibia +264",
+                    "value": "Namibia +264",
+                    "selector": "#react-select-country-option-150"
+                },
+                {
+                    "label": "Nauru +674",
+                    "value": "Nauru +674",
+                    "selector": "#react-select-country-option-151"
+                },
+                {
+                    "label": "Nepal +977",
+                    "value": "Nepal +977",
+                    "selector": "#react-select-country-option-152"
+                },
+                {
+                    "label": "Netherlands +31",
+                    "value": "Netherlands +31",
+                    "selector": "#react-select-country-option-153"
+                },
+                {
+                    "label": "New Caledonia +687",
+                    "value": "New Caledonia +687",
+                    "selector": "#react-select-country-option-154"
+                },
+                {
+                    "label": "New Zealand +64",
+                    "value": "New Zealand +64",
+                    "selector": "#react-select-country-option-155"
+                },
+                {
+                    "label": "Nicaragua +505",
+                    "value": "Nicaragua +505",
+                    "selector": "#react-select-country-option-156"
+                },
+                {
+                    "label": "Niger +227",
+                    "value": "Niger +227",
+                    "selector": "#react-select-country-option-157"
+                },
+                {
+                    "label": "Nigeria +234",
+                    "value": "Nigeria +234",
+                    "selector": "#react-select-country-option-158"
+                },
+                {
+                    "label": "Niue +683",
+                    "value": "Niue +683",
+                    "selector": "#react-select-country-option-159"
+                },
+                {
+                    "label": "Norfolk Island +672",
+                    "value": "Norfolk Island +672",
+                    "selector": "#react-select-country-option-160"
+                },
+                {
+                    "label": "North Korea +850",
+                    "value": "North Korea +850",
+                    "selector": "#react-select-country-option-161"
+                },
+                {
+                    "label": "North Macedonia +389",
+                    "value": "North Macedonia +389",
+                    "selector": "#react-select-country-option-162"
+                },
+                {
+                    "label": "Northern Mariana Islands +1",
+                    "value": "Northern Mariana Islands +1",
+                    "selector": "#react-select-country-option-163"
+                },
+                {
+                    "label": "Norway +47",
+                    "value": "Norway +47",
+                    "selector": "#react-select-country-option-164"
+                },
+                {
+                    "label": "Oman +968",
+                    "value": "Oman +968",
+                    "selector": "#react-select-country-option-165"
+                },
+                {
+                    "label": "Pakistan +92",
+                    "value": "Pakistan +92",
+                    "selector": "#react-select-country-option-166"
+                },
+                {
+                    "label": "Palau +680",
+                    "value": "Palau +680",
+                    "selector": "#react-select-country-option-167"
+                },
+                {
+                    "label": "Palestinian Territories +970",
+                    "value": "Palestinian Territories +970",
+                    "selector": "#react-select-country-option-168"
+                },
+                {
+                    "label": "Panama +507",
+                    "value": "Panama +507",
+                    "selector": "#react-select-country-option-169"
+                },
+                {
+                    "label": "Papua New Guinea +675",
+                    "value": "Papua New Guinea +675",
+                    "selector": "#react-select-country-option-170"
+                },
+                {
+                    "label": "Paraguay +595",
+                    "value": "Paraguay +595",
+                    "selector": "#react-select-country-option-171"
+                },
+                {
+                    "label": "Peru +51",
+                    "value": "Peru +51",
+                    "selector": "#react-select-country-option-172"
+                },
+                {
+                    "label": "Philippines +63",
+                    "value": "Philippines +63",
+                    "selector": "#react-select-country-option-173"
+                },
+                {
+                    "label": "Poland +48",
+                    "value": "Poland +48",
+                    "selector": "#react-select-country-option-174"
+                },
+                {
+                    "label": "Portugal +351",
+                    "value": "Portugal +351",
+                    "selector": "#react-select-country-option-175"
+                },
+                {
+                    "label": "Puerto Rico +1",
+                    "value": "Puerto Rico +1",
+                    "selector": "#react-select-country-option-176"
+                },
+                {
+                    "label": "Qatar +974",
+                    "value": "Qatar +974",
+                    "selector": "#react-select-country-option-177"
+                },
+                {
+                    "label": "Réunion +262",
+                    "value": "Réunion +262",
+                    "selector": "#react-select-country-option-178"
+                },
+                {
+                    "label": "Romania +40",
+                    "value": "Romania +40",
+                    "selector": "#react-select-country-option-179"
+                },
+                {
+                    "label": "Russia +7",
+                    "value": "Russia +7",
+                    "selector": "#react-select-country-option-180"
+                },
+                {
+                    "label": "Rwanda +250",
+                    "value": "Rwanda +250",
+                    "selector": "#react-select-country-option-181"
+                },
+                {
+                    "label": "Samoa +685",
+                    "value": "Samoa +685",
+                    "selector": "#react-select-country-option-182"
+                },
+                {
+                    "label": "San Marino +378",
+                    "value": "San Marino +378",
+                    "selector": "#react-select-country-option-183"
+                },
+                {
+                    "label": "São Tomé & Príncipe +239",
+                    "value": "São Tomé & Príncipe +239",
+                    "selector": "#react-select-country-option-184"
+                },
+                {
+                    "label": "Saudi Arabia +966",
+                    "value": "Saudi Arabia +966",
+                    "selector": "#react-select-country-option-185"
+                },
+                {
+                    "label": "Senegal +221",
+                    "value": "Senegal +221",
+                    "selector": "#react-select-country-option-186"
+                },
+                {
+                    "label": "Serbia +381",
+                    "value": "Serbia +381",
+                    "selector": "#react-select-country-option-187"
+                },
+                {
+                    "label": "Seychelles +248",
+                    "value": "Seychelles +248",
+                    "selector": "#react-select-country-option-188"
+                },
+                {
+                    "label": "Sierra Leone +232",
+                    "value": "Sierra Leone +232",
+                    "selector": "#react-select-country-option-189"
+                },
+                {
+                    "label": "Singapore +65",
+                    "value": "Singapore +65",
+                    "selector": "#react-select-country-option-190"
+                },
+                {
+                    "label": "Sint Maarten +1",
+                    "value": "Sint Maarten +1",
+                    "selector": "#react-select-country-option-191"
+                },
+                {
+                    "label": "Slovakia +421",
+                    "value": "Slovakia +421",
+                    "selector": "#react-select-country-option-192"
+                },
+                {
+                    "label": "Slovenia +386",
+                    "value": "Slovenia +386",
+                    "selector": "#react-select-country-option-193"
+                },
+                {
+                    "label": "Solomon Islands +677",
+                    "value": "Solomon Islands +677",
+                    "selector": "#react-select-country-option-194"
+                },
+                {
+                    "label": "Somalia +252",
+                    "value": "Somalia +252",
+                    "selector": "#react-select-country-option-195"
+                },
+                {
+                    "label": "South Africa +27",
+                    "value": "South Africa +27",
+                    "selector": "#react-select-country-option-196"
+                },
+                {
+                    "label": "South Korea +82",
+                    "value": "South Korea +82",
+                    "selector": "#react-select-country-option-197"
+                },
+                {
+                    "label": "South Sudan +211",
+                    "value": "South Sudan +211",
+                    "selector": "#react-select-country-option-198"
+                },
+                {
+                    "label": "Spain +34",
+                    "value": "Spain +34",
+                    "selector": "#react-select-country-option-199"
+                },
+                {
+                    "label": "Sri Lanka +94",
+                    "value": "Sri Lanka +94",
+                    "selector": "#react-select-country-option-200"
+                },
+                {
+                    "label": "St. Barthélemy +590",
+                    "value": "St. Barthélemy +590",
+                    "selector": "#react-select-country-option-201"
+                },
+                {
+                    "label": "St. Helena +290",
+                    "value": "St. Helena +290",
+                    "selector": "#react-select-country-option-202"
+                },
+                {
+                    "label": "St. Kitts & Nevis +1",
+                    "value": "St. Kitts & Nevis +1",
+                    "selector": "#react-select-country-option-203"
+                },
+                {
+                    "label": "St. Lucia +1",
+                    "value": "St. Lucia +1",
+                    "selector": "#react-select-country-option-204"
+                },
+                {
+                    "label": "St. Martin +590",
+                    "value": "St. Martin +590",
+                    "selector": "#react-select-country-option-205"
+                },
+                {
+                    "label": "St. Pierre & Miquelon +508",
+                    "value": "St. Pierre & Miquelon +508",
+                    "selector": "#react-select-country-option-206"
+                },
+                {
+                    "label": "St. Vincent & Grenadines +1",
+                    "value": "St. Vincent & Grenadines +1",
+                    "selector": "#react-select-country-option-207"
+                },
+                {
+                    "label": "Sudan +249",
+                    "value": "Sudan +249",
+                    "selector": "#react-select-country-option-208"
+                },
+                {
+                    "label": "Suriname +597",
+                    "value": "Suriname +597",
+                    "selector": "#react-select-country-option-209"
+                },
+                {
+                    "label": "Svalbard & Jan Mayen +47",
+                    "value": "Svalbard & Jan Mayen +47",
+                    "selector": "#react-select-country-option-210"
+                },
+                {
+                    "label": "Sweden +46",
+                    "value": "Sweden +46",
+                    "selector": "#react-select-country-option-211"
+                },
+                {
+                    "label": "Switzerland +41",
+                    "value": "Switzerland +41",
+                    "selector": "#react-select-country-option-212"
+                },
+                {
+                    "label": "Syria +963",
+                    "value": "Syria +963",
+                    "selector": "#react-select-country-option-213"
+                },
+                {
+                    "label": "Taiwan +886",
+                    "value": "Taiwan +886",
+                    "selector": "#react-select-country-option-214"
+                },
+                {
+                    "label": "Tajikistan +992",
+                    "value": "Tajikistan +992",
+                    "selector": "#react-select-country-option-215"
+                },
+                {
+                    "label": "Tanzania +255",
+                    "value": "Tanzania +255",
+                    "selector": "#react-select-country-option-216"
+                },
+                {
+                    "label": "Thailand +66",
+                    "value": "Thailand +66",
+                    "selector": "#react-select-country-option-217"
+                },
+                {
+                    "label": "Timor-Leste +670",
+                    "value": "Timor-Leste +670",
+                    "selector": "#react-select-country-option-218"
+                },
+                {
+                    "label": "Togo +228",
+                    "value": "Togo +228",
+                    "selector": "#react-select-country-option-219"
+                },
+                {
+                    "label": "Tokelau +690",
+                    "value": "Tokelau +690",
+                    "selector": "#react-select-country-option-220"
+                },
+                {
+                    "label": "Tonga +676",
+                    "value": "Tonga +676",
+                    "selector": "#react-select-country-option-221"
+                },
+                {
+                    "label": "Trinidad & Tobago +1",
+                    "value": "Trinidad & Tobago +1",
+                    "selector": "#react-select-country-option-222"
+                },
+                {
+                    "label": "Tunisia +216",
+                    "value": "Tunisia +216",
+                    "selector": "#react-select-country-option-223"
+                },
+                {
+                    "label": "Turkey +90",
+                    "value": "Turkey +90",
+                    "selector": "#react-select-country-option-224"
+                },
+                {
+                    "label": "Turkmenistan +993",
+                    "value": "Turkmenistan +993",
+                    "selector": "#react-select-country-option-225"
+                },
+                {
+                    "label": "Turks & Caicos Islands +1",
+                    "value": "Turks & Caicos Islands +1",
+                    "selector": "#react-select-country-option-226"
+                },
+                {
+                    "label": "Tuvalu +688",
+                    "value": "Tuvalu +688",
+                    "selector": "#react-select-country-option-227"
+                },
+                {
+                    "label": "U.S. Virgin Islands +1",
+                    "value": "U.S. Virgin Islands +1",
+                    "selector": "#react-select-country-option-228"
+                },
+                {
+                    "label": "Uganda +256",
+                    "value": "Uganda +256",
+                    "selector": "#react-select-country-option-229"
+                },
+                {
+                    "label": "Ukraine +380",
+                    "value": "Ukraine +380",
+                    "selector": "#react-select-country-option-230"
+                },
+                {
+                    "label": "United Arab Emirates +971",
+                    "value": "United Arab Emirates +971",
+                    "selector": "#react-select-country-option-231"
+                },
+                {
+                    "label": "United Kingdom +44",
+                    "value": "United Kingdom +44",
+                    "selector": "#react-select-country-option-232"
+                },
+                {
+                    "label": "Uruguay +598",
+                    "value": "Uruguay +598",
+                    "selector": "#react-select-country-option-233"
+                },
+                {
+                    "label": "Uzbekistan +998",
+                    "value": "Uzbekistan +998",
+                    "selector": "#react-select-country-option-234"
+                },
+                {
+                    "label": "Vanuatu +678",
+                    "value": "Vanuatu +678",
+                    "selector": "#react-select-country-option-235"
+                },
+                {
+                    "label": "Vatican City +39",
+                    "value": "Vatican City +39",
+                    "selector": "#react-select-country-option-236"
+                },
+                {
+                    "label": "Venezuela +58",
+                    "value": "Venezuela +58",
+                    "selector": "#react-select-country-option-237"
+                },
+                {
+                    "label": "Vietnam +84",
+                    "value": "Vietnam +84",
+                    "selector": "#react-select-country-option-238"
+                },
+                {
+                    "label": "Wallis & Futuna +681",
+                    "value": "Wallis & Futuna +681",
+                    "selector": "#react-select-country-option-239"
+                },
+                {
+                    "label": "Western Sahara +212",
+                    "value": "Western Sahara +212",
+                    "selector": "#react-select-country-option-240"
+                },
+                {
+                    "label": "Yemen +967",
+                    "value": "Yemen +967",
+                    "selector": "#react-select-country-option-241"
+                },
+                {
+                    "label": "Zambia +260",
+                    "value": "Zambia +260",
+                    "selector": "#react-select-country-option-242"
+                },
+                {
+                    "label": "Zimbabwe +263",
+                    "value": "Zimbabwe +263",
+                    "selector": "#react-select-country-option-243"
                 }
             ]
         },
         {
-            "element_index": 10,
-            "field_key": "date_of_birth",
-            "field_type": "date",
-            "question": "Date of Birth",
-            "selector": "#dateOfBirth",
+            "element_index": 4,
+            "field_key": "custom_question",
+            "field_type": "button",
+            "question": "Toggle flyout",
+            "selector": "div:nth-of-type(4) > fieldset > div:nth-of-type(1) > div > div > div > div > div > div:nth-of-type(2) > button",
+            "frame_index": 0,
+            "required": false,
+            "selector_verified": true,
+            "filled": false,
+            "value_verified": false
+        },
+        {
+            "element_index": 5,
+            "field_key": "custom_question",
+            "field_type": "combobox",
+            "question": "Search",
+            "selector": "#iti-0__search-input",
+            "frame_index": 0,
+            "required": false,
+            "selector_verified": true,
+            "filled": false,
+            "value_verified": false
+        },
+        {
+            "element_index": 6,
+            "field_key": "custom_question",
+            "field_type": "button",
+            "question": "Clear search",
+            "selector": "button[aria-label=\"Clear search\"]",
+            "frame_index": 0,
+            "required": false,
+            "selector_verified": true,
+            "filled": false,
+            "value_verified": false
+        },
+        {
+            "element_index": 7,
+            "field_key": "phone",
+            "field_type": "phone",
+            "question": "Phone",
+            "selector": "#phone",
             "frame_index": 0,
             "required": true,
             "selector_verified": true,
             "filled": false,
+            "value_verified": false
+        },
+        {
+            "element_index": 8,
+            "field_key": "resume",
+            "field_type": "file",
+            "question": "Attach",
+            "selector": "#resume",
+            "frame_index": 0,
+            "required": false,
+            "selector_verified": true,
+            "filled": false,
+            "value_verified": false
+        },
+        {
+            "element_index": 9,
+            "field_key": "cover_letter",
+            "field_type": "file",
+            "question": "Attach",
+            "selector": "#cover_letter",
+            "frame_index": 0,
+            "required": false,
+            "selector_verified": true,
+            "filled": false,
+            "value_verified": false
+        },
+        {
+            "element_index": 10,
+            "field_key": "graduation_degree",
+            "field_type": "combobox",
+            "question": "Select...",
+            "selector": "#degree--0",
+            "frame_index": 0,
+            "required": false,
+            "selector_verified": true,
+            "filled": false,
             "value_verified": false,
-            "is_datepicker": true
+            "options": [
+                {
+                    "label": "Associate's Degree",
+                    "value": "Associate's Degree",
+                    "selector": "#react-select-degree--0-option-0"
+                },
+                {
+                    "label": "Bachelor's Degree",
+                    "value": "Bachelor's Degree",
+                    "selector": "#react-select-degree--0-option-1"
+                },
+                {
+                    "label": "Doctor of Medicine (M.D.)",
+                    "value": "Doctor of Medicine (M.D.)",
+                    "selector": "#react-select-degree--0-option-2"
+                },
+                {
+                    "label": "Doctor of Philosophy (Ph.D.)",
+                    "value": "Doctor of Philosophy (Ph.D.)",
+                    "selector": "#react-select-degree--0-option-3"
+                },
+                {
+                    "label": "Engineer's Degree",
+                    "value": "Engineer's Degree",
+                    "selector": "#react-select-degree--0-option-4"
+                },
+                {
+                    "label": "High School",
+                    "value": "High School",
+                    "selector": "#react-select-degree--0-option-5"
+                },
+                {
+                    "label": "Juris Doctor (J.D.)",
+                    "value": "Juris Doctor (J.D.)",
+                    "selector": "#react-select-degree--0-option-6"
+                },
+                {
+                    "label": "Master of Business Administration (M.B.A.)",
+                    "value": "Master of Business Administration (M.B.A.)",
+                    "selector": "#react-select-degree--0-option-7"
+                },
+                {
+                    "label": "Master's Degree",
+                    "value": "Master's Degree",
+                    "selector": "#react-select-degree--0-option-8"
+                },
+                {
+                    "label": "Other",
+                    "value": "Other",
+                    "selector": "#react-select-degree--0-option-9"
+                }
+            ]
         },
         {
             "element_index": 11,
             "field_key": "linkedin_url",
             "field_type": "text",
-            "question": "LinkedIn (URL):",
-            "selector": "#\\34 9b7660a-99be-4d79-ab49-aeea592ca07a",
+            "question": "LinkedIn Profile",
+            "selector": "#question_7927020006",
             "frame_index": 0,
             "required": false,
             "selector_verified": true,
@@ -1139,10 +1420,22 @@
         },
         {
             "element_index": 12,
-            "field_key": "linkedin_url",
-            "field_type": "select",
-            "question": "From where you heard about us? (LinkedIn, institute’s or any placement agencies)",
-            "selector": "#\\35 bf796c2-681f-4633-8142-264c452f9eb2",
+            "field_key": "portfolio_url",
+            "field_type": "text",
+            "question": "Website",
+            "selector": "#question_7927021006",
+            "frame_index": 0,
+            "required": false,
+            "selector_verified": true,
+            "filled": false,
+            "value_verified": false
+        },
+        {
+            "element_index": 13,
+            "field_key": "work_authorization",
+            "field_type": "combobox",
+            "question": "Will you now or in the future, require sponsorship for employment visa status?",
+            "selector": "#question_7927022006",
             "frame_index": 0,
             "required": true,
             "selector_verified": true,
@@ -1150,149 +1443,59 @@
             "value_verified": false,
             "options": [
                 {
-                    "label": "Select an option",
-                    "value": ""
+                    "label": "Yes",
+                    "value": "Yes",
+                    "selector": "#react-select-question_7927022006-option-0"
                 },
                 {
-                    "label": "LinkedIn",
-                    "value": "57903fec-28a7-4355-8c81-df107d986549"
-                },
-                {
-                    "label": "Shine.Com",
-                    "value": "0d494eeb-6af2-4ca5-aa18-798bec0dcf79"
-                },
-                {
-                    "label": "Foundit (Monster)",
-                    "value": "06c2b9c8-1568-484a-8e6f-593b550f865c"
-                },
-                {
-                    "label": "Indeed",
-                    "value": "69f33074-fa13-47b7-bbf7-eef35ee31d0c"
-                },
-                {
-                    "label": "Apna",
-                    "value": "3ba94b30-0914-49d5-9a76-5c3c0e6c79e8"
-                },
-                {
-                    "label": "Consultancies",
-                    "value": "b5be8afd-c28d-480e-bc1e-7dd61c64865c"
-                },
-                {
-                    "label": "Employee Referral",
-                    "value": "3fd5d014-8d07-4cba-99d3-153109a42727"
-                },
-                {
-                    "label": "CFA Institutes",
-                    "value": "9798aadf-645a-4052-b125-c649ae3d6cb1"
-                },
-                {
-                    "label": "Social Media (Facebook or Instagram)",
-                    "value": "8b94bee0-f7b2-4ef4-80da-54e3bff61580"
-                },
-                {
-                    "label": "Campus/Institutes",
-                    "value": "c3be0cea-c464-467b-8e78-df46948dfc7f"
-                },
-                {
-                    "label": "Others",
-                    "value": "63cc02f4-ae19-414a-a3a2-bc14f8406d95"
-                },
-                {
-                    "label": "Naukri.com",
-                    "value": "f293b199-a7c6-4cde-8796-91f4082cb108"
-                },
-                {
-                    "label": "Timesjobs",
-                    "value": "1d8f95c9-6d98-43ed-be24-0db3bb9c6462"
-                },
-                {
-                    "label": "WorkIndia",
-                    "value": "d3dbbf6f-78c9-4549-80e3-a4cfa27f5454"
+                    "label": "No",
+                    "value": "No",
+                    "selector": "#react-select-question_7927022006-option-1"
                 }
             ]
         },
         {
-            "element_index": 13,
-            "field_key": "skills",
+            "element_index": 14,
+            "field_key": "notice_period",
             "field_type": "text",
-            "question": "Skills",
-            "selector": "#skills",
+            "question": "What is your notice period or earliest date of availability?",
+            "selector": "#question_7927023006",
             "frame_index": 0,
             "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 14,
-            "field_key": "education",
-            "field_type": "textarea",
-            "question": "Education",
-            "selector": "#f9e51707-b5eb-4cbf-b13f-23e45ec3dbca",
-            "frame_index": 0,
-            "required": false,
             "selector_verified": true,
             "filled": false,
             "value_verified": false
         },
         {
             "element_index": 15,
-            "field_key": "certification_cfa",
-            "field_type": "select",
-            "question": "Certification CFA Select an option Yes NO",
-            "selector": "#\\36 4c63899-0936-4203-b2ac-069fd3306617",
+            "field_key": "expected_salary",
+            "field_type": "text",
+            "question": "Expected Salary",
+            "selector": "#question_7927024006",
             "frame_index": 0,
             "required": false,
             "selector_verified": true,
             "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "Yes",
-                    "value": "665d4666-5b92-4bea-9ce2-69d9b9843dc7"
-                },
-                {
-                    "label": "NO",
-                    "value": "af114ae4-3ff8-4bb2-a9a5-2aef3f0c4004"
-                }
-            ]
+            "value_verified": false
         },
         {
             "element_index": 16,
-            "field_key": "country",
-            "field_type": "select",
-            "question": "Select an option India Others",
-            "selector": "select[name=\"screeningQuestions.8217673f-503d-4137-8b9c-14c553eb13da.answer\"]",
+            "field_key": "current_salary",
+            "field_type": "text",
+            "question": "Current Salary",
+            "selector": "#question_7927025006",
             "frame_index": 0,
-            "required": true,
+            "required": false,
             "selector_verified": true,
             "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "India",
-                    "value": "3e337d4f-a4cf-4071-81e7-43133ab230b5"
-                },
-                {
-                    "label": "Others",
-                    "value": "7987a121-582a-4b7a-ac02-8b7e96829aed"
-                }
-            ]
+            "value_verified": false
         },
         {
             "element_index": 17,
-            "field_key": "state",
+            "field_key": "next_bonus_payout_date",
             "field_type": "text",
-            "question": "State",
-            "selector": "#\\36 fbf0363-f9da-4d7f-882b-7f268bb84926",
+            "question": "Next bonus payout date",
+            "selector": "#question_7927026006",
             "frame_index": 0,
             "required": true,
             "selector_verified": true,
@@ -1301,10 +1504,10 @@
         },
         {
             "element_index": 18,
-            "field_key": "pincode",
-            "field_type": "text",
-            "question": "Postal Code",
-            "selector": "#\\30 ffcbe16-0f00-4240-bf49-2bf8ff7a239d",
+            "field_key": "friends_or_family_at_company",
+            "field_type": "textarea",
+            "question": "Do you have any friends or family members that are currently employed by Pico?",
+            "selector": "#question_7927027006",
             "frame_index": 0,
             "required": true,
             "selector_verified": true,
@@ -1313,531 +1516,80 @@
         },
         {
             "element_index": 19,
-            "field_key": "graduation_college",
-            "field_type": "text",
-            "question": "Please mention your Bachelor’s (Degree Name, Major's & Minor's, University, Year)",
-            "selector": "#\\38 424c13c-3898-4913-813a-38a378600c09",
+            "field_key": "previous_employment_with_company",
+            "field_type": "combobox",
+            "question": "Have you been employed by Pico or any of its affiliates in the past, either through consulting or direct hire?",
+            "selector": "#question_7927028006",
             "frame_index": 0,
             "required": true,
             "selector_verified": true,
             "filled": false,
-            "value_verified": false
+            "value_verified": false,
+            "options": [
+                {
+                    "label": "Yes",
+                    "value": "Yes",
+                    "selector": "#react-select-question_7927028006-option-0"
+                },
+                {
+                    "label": "No",
+                    "value": "No",
+                    "selector": "#react-select-question_7927028006-option-1"
+                }
+            ]
         },
         {
             "element_index": 20,
-            "field_key": "graduation_college",
-            "field_type": "text",
-            "question": "Please mention your Master’s (Degree Name, Major's & Minor's, University, Year).",
-            "selector": "#\\36 80e615b-f985-4efd-8b1d-5ad553474f90",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 21,
-            "field_key": "graduation_college",
-            "field_type": "text",
-            "question": "Please mention your Additional Certificate's (Degree, Major's & Minor's, University, Year).",
-            "selector": "#\\36 e28a04a-0a94-45a0-bedd-45ea792a65ee",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 22,
-            "field_key": "cfa_level",
-            "field_type": "select",
-            "question": "Select an option Level- 1 Level- 2 Level- 3 Passed None",
-            "selector": "select[name=\"screeningQuestions.37ec8827-5dfa-499c-929a-c75b6a9dcd1b.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "Level- 1",
-                    "value": "2fad8591-6ebe-426a-b8a5-eb643f1440ea"
-                },
-                {
-                    "label": "Level- 2",
-                    "value": "8532f00e-a53d-4847-8952-fbb870f0fb03"
-                },
-                {
-                    "label": "Level- 3",
-                    "value": "07c4e1e9-dca2-4bb8-8ead-0d2d8528927f"
-                },
-                {
-                    "label": "Passed",
-                    "value": "28c10f1f-db9d-4712-8db5-98d69c5e1a02"
-                },
-                {
-                    "label": "None",
-                    "value": "1a1aa9b0-8814-43ba-95d3-20eadabfe77e"
-                }
-            ]
-        },
-        {
-            "element_index": 23,
-            "field_key": "current_company",
-            "field_type": "text",
-            "question": "Could you tell us where you are currently employed?",
-            "selector": "#\\37 6d9cf13-56fb-4178-b418-8c5144e7d7d5",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 24,
             "field_key": "job_title",
-            "field_type": "textarea",
-            "question": "Would you mind providing an overview of your roles and responsibilities in your current position?",
-            "selector": "#\\30 791a16c-17a5-4593-bab9-6acc5892fc45",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 25,
-            "field_key": "experience",
-            "field_type": "select",
-            "question": "Select an option Fresher 00-03 Years 03-05 Years 05-08 Years 8+ Years",
-            "selector": "select[name=\"screeningQuestions.dacfd8ec-aec9-4bcf-b90b-1419791551ad.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "Fresher",
-                    "value": "a45c73ec-2425-41a1-a215-f14e5002b4fb"
-                },
-                {
-                    "label": "00-03 Years",
-                    "value": "0d37b16a-3f17-4a4e-8482-5a552b94861b"
-                },
-                {
-                    "label": "03-05 Years",
-                    "value": "9f392cbd-c1ff-48f9-82bd-c9155ab99baa"
-                },
-                {
-                    "label": "05-08 Years",
-                    "value": "cb1d6eac-ff1e-4429-8af8-1671b7780329"
-                },
-                {
-                    "label": "8+ Years",
-                    "value": "a98a883f-2fb3-4638-abd3-7eda6fd47653"
-                }
-            ]
-        },
-        {
-            "element_index": 26,
-            "field_key": "experience_commercial_real_estate",
-            "field_type": "select",
-            "question": "Are you familiar with or have you worked in the Commercial Real Estate Sector?",
-            "selector": "select[name=\"screeningQuestions.66e06d56-6a32-4ab1-9494-ac7fa1be74d0.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "Yes",
-                    "value": "766b8172-1c00-4b2c-8510-99a104543e19"
-                },
-                {
-                    "label": "No",
-                    "value": "a8450a65-9729-41fe-abdd-607726eda45c"
-                }
-            ]
-        },
-        {
-            "element_index": 27,
-            "field_key": "experience",
-            "field_type": "select",
-            "question": "Have you had any prior experience with Advanced Financial Modeling using Excel ? (Rate yourself out of 5)",
-            "selector": "select[name=\"screeningQuestions.ee710120-f0a8-4969-a8ff-9cdde07f2d64.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "1 Out of 5",
-                    "value": "b42b760f-a613-4db7-90ee-7401b72030a2"
-                },
-                {
-                    "label": "2 Out of 5",
-                    "value": "96fd8c8d-f2ec-40c1-8fa0-dd852831d76e"
-                },
-                {
-                    "label": "3 Out of 5",
-                    "value": "ee120d25-05ca-4526-a2f3-4efe5c7daa3f"
-                },
-                {
-                    "label": "4 Out of 5",
-                    "value": "417d2b5a-222a-47ba-adbc-26aecc16cd55"
-                },
-                {
-                    "label": "5 Out of 5",
-                    "value": "840bdec5-e6e5-4392-b0e0-6187afe12d8c"
-                }
-            ]
-        },
-        {
-            "element_index": 28,
-            "field_key": "experience_years",
-            "field_type": "select",
-            "question": "Could you provide insight into your years of experience in Equity Research?",
-            "selector": "select[name=\"screeningQuestions.5a17398b-e195-49a8-ab7c-8b7a4d77cab2.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "1 Year",
-                    "value": "8aa1bf3c-28ab-49de-b287-7b2c34c1401e"
-                },
-                {
-                    "label": "2 Years",
-                    "value": "1c64c0d1-90c1-4bbc-84d4-eec2694a5098"
-                },
-                {
-                    "label": "3 Years",
-                    "value": "9d1a0d36-a89a-4228-8126-6dfbdf2369a4"
-                },
-                {
-                    "label": "4 Years",
-                    "value": "28260db1-d2b4-42b6-a2c3-bced712c0ef7"
-                },
-                {
-                    "label": "5+ Years",
-                    "value": "f5b1143f-139a-45e5-bff1-0b4e798e3a4b"
-                },
-                {
-                    "label": "None",
-                    "value": "d7019549-dc9b-4d11-9813-d0ece9a06342"
-                }
-            ]
-        },
-        {
-            "element_index": 29,
-            "field_key": "experience",
-            "field_type": "select",
-            "question": "Could you kindly share your experience level with Argus modeling?",
-            "selector": "select[name=\"screeningQuestions.7ff7afa4-c97a-4ed7-b171-911d544758c7.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "1 Year",
-                    "value": "97fab1f3-25a9-4a45-93bc-e10d6ab5207c"
-                },
-                {
-                    "label": "2 Years",
-                    "value": "5316a104-e07a-476c-bf14-b3c39dc9ca8e"
-                },
-                {
-                    "label": "3 Years",
-                    "value": "56170e0f-f44e-4080-9f1c-2f505dcf9b45"
-                },
-                {
-                    "label": "4 Years",
-                    "value": "65e4fbe0-ccb2-4128-83c7-2ff7ac717f5f"
-                },
-                {
-                    "label": "5 Years",
-                    "value": "513843f7-86e1-4b3e-9b86-af0b6be62ef8"
-                },
-                {
-                    "label": "None",
-                    "value": "5559e705-cee2-4d23-8c71-353f113991dd"
-                }
-            ]
-        },
-        {
-            "element_index": 30,
-            "field_key": "experience",
-            "field_type": "select",
-            "question": "How much experience do you have in the field of Investment Banking?",
-            "selector": "select[name=\"screeningQuestions.73374c20-0aeb-46a8-a940-13c6aa9c1cf1.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "1 Year",
-                    "value": "2974e3f6-3c73-4e13-a67f-2f009805646a"
-                },
-                {
-                    "label": "2 Years",
-                    "value": "54ba92f5-a675-4537-abd9-c99bf9f54006"
-                },
-                {
-                    "label": "3 Years",
-                    "value": "d203558a-dfe4-40a3-ac62-fb8ffbfa3a13"
-                },
-                {
-                    "label": "4 Years",
-                    "value": "dca5bad7-0e40-4a39-b14f-6da3883114f0"
-                },
-                {
-                    "label": "5 Years",
-                    "value": "12fad42c-f89d-40c2-a97d-080074bf1fbc"
-                },
-                {
-                    "label": "None",
-                    "value": "b1560038-9e03-4d1e-a0fd-e18b313bba0b"
-                }
-            ]
-        },
-        {
-            "element_index": 31,
-            "field_key": "experience_dcf_modelling",
-            "field_type": "select",
-            "question": "How many years have you been involved with DCF Modelling?",
-            "selector": "select[name=\"screeningQuestions.fb000522-f72f-4192-86ce-a8368c6cee81.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "Yes",
-                    "value": "7c4ac4ad-a371-4e19-ba49-da5b380e67c0"
-                },
-                {
-                    "label": "No",
-                    "value": "ee7a976c-3fa1-47e7-8735-1b0a0e21b7b4"
-                }
-            ]
-        },
-        {
-            "element_index": 32,
-            "field_key": "experience_years",
-            "field_type": "select",
-            "question": "How many years of experience do you have in interacting directly with clients?",
-            "selector": "select[name=\"screeningQuestions.bf1ecc3b-424c-4496-8f1c-d2918fb9cc19.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "1 Year",
-                    "value": "3fc128b4-b569-4754-b531-88e6fe994c2a"
-                },
-                {
-                    "label": "2 Years",
-                    "value": "19027d20-e4aa-4f84-b881-70a9cb7facac"
-                },
-                {
-                    "label": "3 Years",
-                    "value": "632c8545-374f-4a92-94c1-c6c2ad082193"
-                },
-                {
-                    "label": "4 Years",
-                    "value": "eaf35a5b-0329-4867-a61a-f2e0ea5640aa"
-                },
-                {
-                    "label": "5 Years",
-                    "value": "ae7866fa-ba7a-4328-b01a-f5cf7238fa33"
-                },
-                {
-                    "label": "None",
-                    "value": "4919bb8c-20b7-4bb4-977e-6dd11f43e26b"
-                }
-            ]
-        },
-        {
-            "element_index": 33,
-            "field_key": "comfortable_us_hours",
-            "field_type": "select",
-            "question": "Since our clients are predominantly based in US time zones, are you comfortable working during typical US business hours?",
-            "selector": "select[name=\"screeningQuestions.8b75c3c0-4406-454f-9843-bafe87643e71.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "Yes",
-                    "value": "ed3eaf81-38bd-48eb-81c9-bc1a746a1fdc"
-                },
-                {
-                    "label": "No",
-                    "value": "86c8abd8-350e-417d-b492-517ddcb6daf1"
-                }
-            ]
-        },
-        {
-            "element_index": 34,
-            "field_key": "notice_period",
-            "field_type": "select",
-            "question": "Could you help us to confirm the notice period required at your current job? We are seeking candidates who are available for immediate joining in this position.",
-            "selector": "select[name=\"screeningQuestions.cfa62009-9236-4749-873e-a1964b395ba4.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "Immediately Available",
-                    "value": "babf3f95-2e90-416d-b9cb-a279b1ecdab0"
-                },
-                {
-                    "label": "15 Days",
-                    "value": "4749f6ab-3f1e-4536-9fb0-9b93d43e2bb9"
-                },
-                {
-                    "label": "30 Days",
-                    "value": "d4e6b474-377c-42de-8cdb-18924e1fc430"
-                },
-                {
-                    "label": "60 Days",
-                    "value": "faf49b39-43b5-4b42-a3ad-23d7309bc6f5"
-                },
-                {
-                    "label": "90 Days",
-                    "value": "8bdd0f43-c9d6-4f44-a5f8-b2afabfa5a8e"
-                },
-                {
-                    "label": "Already Serving",
-                    "value": "51370aff-26ff-4f33-b48a-4bef5f3a5249"
-                }
-            ]
-        },
-        {
-            "element_index": 35,
-            "field_key": "current_salary",
-            "field_type": "select",
-            "question": "Select an option 00-05 Lakhs Per Annum 05-07 Lakhs Per Annum 07-10 Lakhs Per Annum 10-12 Lakhs Per Annum 12-15 Lakhs Per Annum 15+ Lakhs Per Annum",
-            "selector": "select[name=\"screeningQuestions.c5019c15-b5b4-4c81-9515-aec17fd4772e.answer\"]",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false,
-            "options": [
-                {
-                    "label": "Select an option",
-                    "value": ""
-                },
-                {
-                    "label": "00-05 Lakhs Per Annum",
-                    "value": "e9b56051-ac0b-4a5c-9201-c61fdf0ba75d"
-                },
-                {
-                    "label": "05-07 Lakhs Per Annum",
-                    "value": "1c35e45f-b397-4979-aeaf-fa9e2600b267"
-                },
-                {
-                    "label": "07-10 Lakhs Per Annum",
-                    "value": "ef6c2182-abc3-482c-a1fd-cdf2026b7375"
-                },
-                {
-                    "label": "10-12 Lakhs Per Annum",
-                    "value": "d4e2e1d0-ff2e-48e6-a526-538ac909383e"
-                },
-                {
-                    "label": "12-15 Lakhs Per Annum",
-                    "value": "c9329ab5-c630-49cd-ba3d-18d0f7f05e94"
-                },
-                {
-                    "label": "15+ Lakhs Per Annum",
-                    "value": "896e3763-ab6a-4c23-aec7-4e44aa748b0f"
-                }
-            ]
-        },
-        {
-            "element_index": 36,
-            "field_key": "custom_question",
-            "field_type": "text",
-            "question": "Back to all job openings",
-            "selector": "#captcha",
-            "frame_index": 0,
-            "required": true,
-            "selector_verified": true,
-            "filled": false,
-            "value_verified": false
-        },
-        {
-            "element_index": 38,
-            "field_key": "agreement",
-            "field_type": "checkbox",
-            "question": "By applying, you hereby accept the data processing terms under the Privacy Policy and give consent to processing of the data as part of this job application.",
-            "selector": "#candidateConsent",
+            "field_type": "combobox",
+            "question": "How did you hear about the position?",
+            "selector": "#question_7927029006",
             "frame_index": 0,
             "required": false,
             "selector_verified": true,
             "filled": false,
-            "value_verified": false
+            "value_verified": false,
+            "options": [
+                {
+                    "label": "LinkedIn",
+                    "value": "LinkedIn",
+                    "selector": "#react-select-question_7927029006-option-0"
+                },
+                {
+                    "label": "Pico Job Board",
+                    "value": "Pico Job Board",
+                    "selector": "#react-select-question_7927029006-option-1"
+                },
+                {
+                    "label": "External Job Board",
+                    "value": "External Job Board",
+                    "selector": "#react-select-question_7927029006-option-2"
+                },
+                {
+                    "label": "Friends",
+                    "value": "Friends",
+                    "selector": "#react-select-question_7927029006-option-3"
+                }
+            ]
+        },
+        {
+            "element_index": 21,
+            "field_key": "notice_period",
+            "field_type": "combobox",
+            "question": "I hereby acknowledge and read the Pico Job Candidate Privacy Notice.",
+            "selector": "#question_7927030006",
+            "frame_index": 0,
+            "required": true,
+            "selector_verified": true,
+            "filled": false,
+            "value_verified": false,
+            "options": [
+                {
+                    "label": "Yes",
+                    "value": "Yes",
+                    "selector": "#react-select-question_7927030006-option-0"
+                }
+            ]
         }
     ]
 }

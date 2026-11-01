@@ -9101,201 +9101,201 @@ class FormFiller:
 
         for x in deterministic:
             print(f"{x['field']:30} -> [{x['element_index']}] {x['value']}")
+        try:
+            await self.page.wait_for_load_state("domcontentloaded", timeout=15000)
+        except Exception:
             try:
-                await self.page.wait_for_load_state("domcontentloaded", timeout=15000)
-            except Exception:
-                try:
-                    await self.page.goto(job_url, timeout=PAGE_LOAD_TIMEOUT_MS)
-                except Exception:
-                    pass
-
-            await self.wait_for_form(self.page, resume)
-            try:
-                await self.page.evaluate("window.scrollTo(0, 0)")
+                await self.page.goto(job_url, timeout=PAGE_LOAD_TIMEOUT_MS)
             except Exception:
                 pass
 
-            for i, frame in enumerate(self.page.frames):
-                print(f"  [{i}] {frame.url}")
+        await self.wait_for_form(self.page, resume)
+        try:
+            await self.page.evaluate("window.scrollTo(0, 0)")
+        except Exception:
+            pass
 
-            try:
-                elements = await self.enrich_cu_select_elements(self.page, elements)
-            except Exception as exc:
-                print(f"cu-select enrichment failed (non-fatal): {exc}")
+        for i, frame in enumerate(self.page.frames):
+            print(f"  [{i}] {frame.url}")
 
-            try:
-                new_fields = await self.discover_new_fields_after_expansion(self.page, elements)
-                if new_fields:
-                    print(f"[Runtime] Discovered {len(new_fields)} new required fields after expansion")
-                    elements.extend(new_fields)
-                    deterministic = self.deterministic_candidates(elements, resume_idx, important, resume=resume)
-            except Exception as exc:
-                print(f"[Runtime] New-field discovery failed (non-fatal): {exc}")
+        try:
+            elements = await self.enrich_cu_select_elements(self.page, elements)
+        except Exception as exc:
+            print(f"cu-select enrichment failed (non-fatal): {exc}")
 
-            by_index = {e["_element_index"]: e for e in elements}
+        try:
+            new_fields = await self.discover_new_fields_after_expansion(self.page, elements)
+            if new_fields:
+                print(f"[Runtime] Discovered {len(new_fields)} new required fields after expansion")
+                elements.extend(new_fields)
+                deterministic = self.deterministic_candidates(elements, resume_idx, important, resume=resume)
+        except Exception as exc:
+            print(f"[Runtime] New-field discovery failed (non-fatal): {exc}")
 
-            phone_country_results = await self.set_phone_country_if_needed(self.page, elements, resume_idx, deterministic)
-            for r in phone_country_results:
-                print(f"phone_country_code-> {r['answer']} {'VERIFIED' if r['verified'] else 'NOT VERIFIED'}")
+        by_index = {e["_element_index"]: e for e in elements}
 
+        phone_country_results = await self.set_phone_country_if_needed(self.page, elements, resume_idx, deterministic)
+        for r in phone_country_results:
+            print(f"phone_country_code-> {r['answer']} {'VERIFIED' if r['verified'] else 'NOT VERIFIED'}")
+
+        print()
+        print("=" * 60)
+        print("DETERMINISTIC RESUME FILL")
+        print("=" * 60)
+
+        deterministic_results = []
+        by_index = {e["_element_index"]: e for e in elements}
+
+        verified_country_indexes = {r["element_index"] for r in phone_country_results if r.get("verified")}
+        for r in phone_country_results:
+            if r.get("verified"):
+                deterministic_results.append(r)
+
+        for item in deterministic:
+            e = by_index[item["element_index"]]
+            if item["field"] == "phone_country_code" and item["element_index"] in verified_country_indexes:
+                continue
+
+            answer_item = {
+                "element_index": item["element_index"],
+                "answer": item["value"],
+                "action": item["action"],
+                "option_label": item.get("option_label"),
+                "option_value": item.get("option_value"),
+                "country_code": resume_idx.get("country_code") if self.is_phone_element(e) else None,
+            }
+
+            result = await self.retry_failed_answer(self.page, e, answer_item)
+            deterministic_results.append(result)
+
+            status = "VERIFIED" if result.get("verified") else "NOT VERIFIED"
+            print(f"{item['field']:30} -> {item['value']}")
+            print(f"   -> {status} ({result.get('method')})")
+
+        national = self.clean_text(resume_idx.get("national_phone"))
+        country = self.clean_text(resume_idx.get("country_code"))
+        for e in elements:
+            if not self.is_phone_element(e) or self.is_phone_country_element(e):
+                continue
+            phone_loc, _, _ = await self.locator_from_element(self.page, e)
+            if not phone_loc or not national:
+                continue
+            actual = self.digits(await self.read_control_value(phone_loc))
+            need = self.digits(national)[-10:] if len(self.digits(national)) >= 10 else self.digits(national)
+            if need and need in actual:
+                continue
+            ok, actual = await self.fill_phone_widget(phone_loc, national, country)
+            print(f"phone repair -> {'VERIFIED' if ok else 'NOT VERIFIED'} ({actual})")
+
+        filled_indexes = {x["element_index"] for x in deterministic_results if x.get("verified")}
+        deterministic_indexes = {x["element_index"] for x in deterministic}
+
+        # Exclude elements from AI:
+        # 1. Any element already filled/verified
+        # 2. Any element that has a deterministic candidate (resume data exists)
+        # 3. Any file/resume upload element
+        ai_excluded = set(filled_indexes) | deterministic_indexes
+
+        remaining_raw = []
+        for e in elements:
+            idx = e["_element_index"]
+            if idx in ai_excluded or self.is_captcha(e) or self.is_submit(e) or self.is_noise_control(e):
+                continue
+            if self.norm(e.get("tag")) == "button" or self.norm(e.get("type")) in {"button", "submit", "reset"} or self.norm(e.get("control_type")) in {"button", "submit_button"}:
+                continue
+            if self.is_file_upload(e) or self.looks_like_resume_upload(e) or self.norm(e.get("type")) == "file" or self.control_kind(e) == "upload":
+                continue
+            if e.get("disabled") is True or self.norm(e.get("type")) == "hidden":
+                continue
+            remaining_raw.append(e)
+
+        if important:
+            remaining = [
+                e for e in self.collect_fill_targets(elements, important)
+                if e["_element_index"] not in ai_excluded
+                and not self.is_noise_control(e)
+                and not self.is_captcha(e)
+                and not self.is_submit(e)
+                and self.norm(e.get("tag")) != "button"
+                and self.norm(e.get("type")) not in {"button", "submit", "reset"}
+                and self.norm(e.get("control_type")) not in {"button", "submit_button"}
+                and not self.is_file_upload(e)
+                and not self.looks_like_resume_upload(e)
+                and self.norm(e.get("type")) != "file"
+                and self.control_kind(e) != "upload"
+            ]
+        else:
+            remaining = self.dedupe_interactive_elements(remaining_raw)
+
+        filled_keys = {self._question_key(by_index[i]) for i in ai_excluded if i in by_index}
+        remaining = [e for e in remaining if self._question_key(e) not in filled_keys]
+        remaining = self.dedupe_interactive_elements(remaining)
+
+        print()
+        print("=" * 60)
+        print("REMAINING QUESTIONS")
+        print("=" * 60)
+        print(f"Questions sent to AI: {len(remaining)}")
+
+        ai_data = {"answers": []}
+        if remaining:
             print()
             print("=" * 60)
-            print("DETERMINISTIC RESUME FILL")
+            print(f"AI BATCH MAPPING: {len(remaining)} controls")
+            print(f"Batch size: {AI_BATCH_SIZE} | Max batches: {AI_MAX_BATCHES if AI_MAX_BATCHES > 0 else 'unlimited'}")
             print("=" * 60)
-
-            deterministic_results = []
-            by_index = {e["_element_index"]: e for e in elements}
-
-            verified_country_indexes = {r["element_index"] for r in phone_country_results if r.get("verified")}
-            for r in phone_country_results:
-                if r.get("verified"):
-                    deterministic_results.append(r)
-
-            for item in deterministic:
-                e = by_index[item["element_index"]]
-                if item["field"] == "phone_country_code" and item["element_index"] in verified_country_indexes:
-                    continue
-
-                answer_item = {
-                    "element_index": item["element_index"],
-                    "answer": item["value"],
-                    "action": item["action"],
-                    "option_label": item.get("option_label"),
-                    "option_value": item.get("option_value"),
-                    "country_code": resume_idx.get("country_code") if self.is_phone_element(e) else None,
-                }
-
-                result = await self.retry_failed_answer(self.page, e, answer_item)
-                deterministic_results.append(result)
-
-                status = "VERIFIED" if result.get("verified") else "NOT VERIFIED"
-                print(f"{item['field']:30} -> {item['value']}")
-                print(f"   -> {status} ({result.get('method')})")
-
-            national = self.clean_text(resume_idx.get("national_phone"))
-            country = self.clean_text(resume_idx.get("country_code"))
-            for e in elements:
-                if not self.is_phone_element(e) or self.is_phone_country_element(e):
-                    continue
-                phone_loc, _, _ = await self.locator_from_element(self.page, e)
-                if not phone_loc or not national:
-                    continue
-                actual = self.digits(await self.read_control_value(phone_loc))
-                need = self.digits(national)[-10:] if len(self.digits(national)) >= 10 else self.digits(national)
-                if need and need in actual:
-                    continue
-                ok, actual = await self.fill_phone_widget(phone_loc, national, country)
-                print(f"phone repair -> {'VERIFIED' if ok else 'NOT VERIFIED'} ({actual})")
-
-            filled_indexes = {x["element_index"] for x in deterministic_results if x.get("verified")}
-            deterministic_indexes = {x["element_index"] for x in deterministic}
-
-            # Exclude elements from AI:
-            # 1. Any element already filled/verified
-            # 2. Any element that has a deterministic candidate (resume data exists)
-            # 3. Any file/resume upload element
-            ai_excluded = set(filled_indexes) | deterministic_indexes
-
-            remaining_raw = []
-            for e in elements:
-                idx = e["_element_index"]
-                if idx in ai_excluded or self.is_captcha(e) or self.is_submit(e) or self.is_noise_control(e):
-                    continue
-                if self.norm(e.get("tag")) == "button" or self.norm(e.get("type")) in {"button", "submit", "reset"} or self.norm(e.get("control_type")) in {"button", "submit_button"}:
-                    continue
-                if self.is_file_upload(e) or self.looks_like_resume_upload(e) or self.norm(e.get("type")) == "file" or self.control_kind(e) == "upload":
-                    continue
-                if e.get("disabled") is True or self.norm(e.get("type")) == "hidden":
-                    continue
-                remaining_raw.append(e)
-
-            if important:
-                remaining = [
-                    e for e in self.collect_fill_targets(elements, important)
-                    if e["_element_index"] not in ai_excluded
-                    and not self.is_noise_control(e)
-                    and not self.is_captcha(e)
-                    and not self.is_submit(e)
-                    and self.norm(e.get("tag")) != "button"
-                    and self.norm(e.get("type")) not in {"button", "submit", "reset"}
-                    and self.norm(e.get("control_type")) not in {"button", "submit_button"}
-                    and not self.is_file_upload(e)
-                    and not self.looks_like_resume_upload(e)
-                    and self.norm(e.get("type")) != "file"
-                    and self.control_kind(e) != "upload"
-                ]
-            else:
-                remaining = self.dedupe_interactive_elements(remaining_raw)
-
-            filled_keys = {self._question_key(by_index[i]) for i in ai_excluded if i in by_index}
-            remaining = [e for e in remaining if self._question_key(e) not in filled_keys]
-            remaining = self.dedupe_interactive_elements(remaining)
-
-            print()
-            print("=" * 60)
-            print("REMAINING QUESTIONS")
-            print("=" * 60)
-            print(f"Questions sent to AI: {len(remaining)}")
-
-            ai_data = {"answers": []}
-            if remaining:
-                print()
-                print("=" * 60)
-                print(f"AI BATCH MAPPING: {len(remaining)} controls")
-                print(f"Batch size: {AI_BATCH_SIZE} | Max batches: {AI_MAX_BATCHES if AI_MAX_BATCHES > 0 else 'unlimited'}")
-                print("=" * 60)
-                batches = [remaining[i:i + max(1, AI_BATCH_SIZE)] for i in range(0, len(remaining), max(1, AI_BATCH_SIZE))]
-                max_batches = len(batches) if AI_MAX_BATCHES <= 0 else min(len(batches), AI_MAX_BATCHES)
-                for batch_no, batch in enumerate(batches[:max_batches], 1):
+            batches = [remaining[i:i + max(1, AI_BATCH_SIZE)] for i in range(0, len(remaining), max(1, AI_BATCH_SIZE))]
+            max_batches = len(batches) if AI_MAX_BATCHES <= 0 else min(len(batches), AI_MAX_BATCHES)
+            for batch_no, batch in enumerate(batches[:max_batches], 1):
                     print(f"AI batch {batch_no}/{max_batches} -> {len(batch)} controls")
                     try:
                         batch_data = self.normalize_ai_answers(self.call_bedrock(self.build_ai_prompt(batch, resume, deterministic)))
                         ai_data["answers"].extend(batch_data.get("answers", []))
                     except Exception as exc:
                         print(f"AI batch {batch_no} failed: {exc}")
-                if len(batches) > max_batches:
+            if len(batches) > max_batches:
                     print(f"WARNING: {len(batches) - max_batches} AI batches skipped; those fields will be asked from the user.")
-                # self.save_json(AI_ANSWERS_FILE, ai_data)
-                print(json.dumps(ai_data, indent=2, ensure_ascii=False))
+            # self.save_json(AI_ANSWERS_FILE, ai_data)
+            print(json.dumps(ai_data, indent=2, ensure_ascii=False))
 
-            def _prefer_not(text: Any) -> bool:
-                t = self.canonical_text(text)
-                return t.startswith("prefer not") or t in {"decline to self identify", "decline to answer"}
+        def _prefer_not(text: Any) -> bool:
+            t = self.canonical_text(text)
+            return t.startswith("prefer not") or t in {"decline to self identify", "decline to answer"}
 
-            for item in ai_data.get("answers", []):
-                if not isinstance(item, dict) or not str(item.get("element_index", "")).isdigit():
+        for item in ai_data.get("answers", []):
+            if not isinstance(item, dict) or not str(item.get("element_index", "")).isdigit():
                     continue
-                e = by_index.get(int(item["element_index"]))
-                if not e:
+            e = by_index.get(int(item["element_index"]))
+            if not e:
                     continue
-                q = self.canonical_text(e.get("question") or e.get("label"))
-                ans = item.get("option_label") or item.get("answer")
-                if "gender" in q:
-                    if resume_idx.get("gender"):
-                        item["answer"] = resume_idx["gender"]
-                        item["option_label"] = resume_idx["gender"]
-                        item["action"] = "select"
-                    elif _prefer_not(ans):
-                        item["action"] = "skip"
-                        item["answer"] = ""
-                if "ethnicity" in q or re.search(r"\brace\b", q):
-                    if resume_idx.get("ethnicity"):
-                        item["answer"] = resume_idx["ethnicity"]
-                        item["option_label"] = resume_idx["ethnicity"]
-                        item["action"] = "select"
-                    elif _prefer_not(ans):
-                        item["action"] = "skip"
-                        item["answer"] = ""
+            q = self.canonical_text(e.get("question") or e.get("label"))
+            ans = item.get("option_label") or item.get("answer")
+            if "gender" in q:
+                if resume_idx.get("gender"):
+                    item["answer"] = resume_idx["gender"]
+                    item["option_label"] = resume_idx["gender"]
+                    item["action"] = "select"
+                elif _prefer_not(ans):
+                    item["action"] = "skip"
+                    item["answer"] = ""
+            if "ethnicity" in q or re.search(r"\brace\b", q):
+                if resume_idx.get("ethnicity"):
+                    item["answer"] = resume_idx["ethnicity"]
+                    item["option_label"] = resume_idx["ethnicity"]
+                    item["action"] = "select"
+                elif _prefer_not(ans):
+                    item["action"] = "skip"
+                    item["answer"] = ""
 
-            ai_answer_items = ai_data.get("answers", [])
-            ai_indexes = {
-                int(x.get("element_index"))
-                for x in ai_answer_items
-                if isinstance(x, dict)
-                and str(x.get("element_index", "")).isdigit()
-                and self.norm(x.get("action")) != "skip"
-                and self.clean_text(x.get("answer") or x.get("option_label"))
-            }
+        ai_answer_items = ai_data.get("answers", [])
+        ai_indexes = {
+            int(x.get("element_index"))
+            for x in ai_answer_items
+            if isinstance(x, dict)
+            and str(x.get("element_index", "")).isdigit()
+            and self.norm(x.get("action")) != "skip"
+            and self.clean_text(x.get("answer") or x.get("option_label"))
+        }
 
             for e in remaining:
                 idx = e.get("_element_index")

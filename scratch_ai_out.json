@@ -1,0 +1,60 @@
+```json
+{
+  "answers": [
+    {
+      "question": "Share your GitHub profile",
+      "answer": "https://github.com/i-amanksingh",
+      "action": "fill",
+      "option_label": ""
+    },
+    {
+      "question": "Share your LinkedIn profile",
+      "answer": "https://www.linkedin.com/in/i-amanksingh",
+      "action": "fill",
+      "option_label": ""
+    },
+    {
+      "question": "Have you built a website before?",
+      "answer": "https://github.com/i-amanksingh",
+      "action": "fill",
+      "option_label": ""
+    },
+    {
+      "question": "What is your gender?",
+      "answer": "A Male",
+      "action": "radio",
+      "option_label": "A Male"
+    },
+    {
+      "question": "How much work experience do you have?",
+      "answer": "B Less than 2 years",
+      "action": "radio",
+      "option_label": "B Less than 2 years"
+    },
+    {
+      "question": "Are you in Hyderabad, or able to relocate immediately?",
+      "answer": "Yes",
+      "action": "radio",
+      "option_label": "Yes"
+    },
+    {
+      "question": "Your salary for the first 3 months may be below ₹30,000 per month. Are you okay with this?",
+      "answer": "Yes",
+      "action": "radio",
+      "option_label": "Yes"
+    },
+    {
+      "question": "Can you join immediately?",
+      "answer": "Yes",
+      "action": "radio",
+      "option_label": "Yes"
+    },
+    {
+      "question": "What did you build that website with?",
+      "answer": "Frontend: React, Backend: Python, FastAPI",
+      "action": "fill",
+      "option_label": ""
+    }
+  ]
+}
+```
